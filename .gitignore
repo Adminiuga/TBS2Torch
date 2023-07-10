@@ -1,0 +1,24 @@
+**.vscode
+**.bak
+**/.project
+**/.settings
+*/artifact
+*/.cproject
+*/.projectchecksums
+*/.projectlinkstore
+*/*.Makefile
+*/GNU ARM */
+*/.uceditor
+*/autogen/*
+*/.trash/
+*/*.project.mak
+
+*/.pdm
+*.pdf
+
+*.*~
+
+# workspace dirs
+.browser
+.metadata
+outgoing

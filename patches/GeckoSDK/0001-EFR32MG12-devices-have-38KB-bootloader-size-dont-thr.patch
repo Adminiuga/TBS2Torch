@@ -1,0 +1,29 @@
+From f3346c6616c589ca68f75afa15a55907a10517cc Mon Sep 17 00:00:00 2001
+From: Alexei Chetroi <Alexei.Chetroi@outlook.com>
+Date: Mon, 15 May 2023 19:50:36 -0400
+Subject: [PATCH] EFR32MG12 devices have 38KB bootloader size, dont throw an
+ assertion error
+
+---
+ platform/service/legacy_hal/src/bootloader-interface-app.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/platform/service/legacy_hal/src/bootloader-interface-app.c b/platform/service/legacy_hal/src/bootloader-interface-app.c
+index 1a10227f5..438412b52 100644
+--- a/platform/service/legacy_hal/src/bootloader-interface-app.c
++++ b/platform/service/legacy_hal/src/bootloader-interface-app.c
+@@ -67,7 +67,11 @@ static void verifyMainBootloaderVersion(uint32_t version)
+   assert(((uint32_t)mainBootloaderTable & 0xFFFF0000U) == FLASH_MEM_BASE
+          || ((uint32_t)mainBootloaderTable & 0xFFFF0000U) == 0x0FE10000U);
+   // Assert that the main bootloader table pointer points inside the bootloader
++#ifdef _SILICON_LABS_32B_SERIES_1_CONFIG_2
++  assert(((uint32_t)mainBootloaderTable & 0x0000FFFFU) < 0x9800U);
++#else  // ! _SILICON_LABS_32B_SERIES_1_CONFIG_2
+   assert(((uint32_t)mainBootloaderTable & 0x0000FFFFU) < 0x4000U);
++#endif // _SILICON_LABS_32B_SERIES_1_CONFIG_2
+ 
+   assert(mainBootloaderTable->header.version >= version);
+ }
+-- 
+2.40.1.windows.1
+

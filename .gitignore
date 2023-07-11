@@ -2,6 +2,10 @@
 **.bak
 **/.project
 **/.settings
+*.ew[dpw]
+*.ipcf
+*.slps
+vscode.conf
 */artifact
 */.cproject
 */.projectchecksums

@@ -17,6 +17,8 @@ on:
       - Dockerfile
       - .github/workflows/build.yaml
       - .github/workflows/silabs-project-builder.yaml
+      - TBS2Torch/**
+      - patches/**
     branches:
       - main
     tags:

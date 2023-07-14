@@ -2,12 +2,19 @@
 
 ## What is this?
 
-This is a Zigbee Light running on [Thunderboard Sense 2](https://www.silabs.com/documents/public/user-guides/ug309-sltb004a-user-guide.pdf) *"the ultimate multi-sensor, multiprotocol cloud inspiration kit"*. This is also my toy project in an attempt to learn the Zigbee Application Framework. The project is based on Zigbee 3 Light example project, with some addion like hall sensor, IMU sensor etc to provide some interface for the light and device control.
+This is a Zigbee Light running on [Thunderboard Sense 2](https://www.silabs.com/documents/public/user-guides/ug309-sltb004a-user-guide.pdf) *"the ultimate multi-sensor, multiprotocol cloud inspiration kit"*.
+This is also my toy project, an attempt to learn the Zigbee Application Framework. The project is based on Zigbee 3 Light
+example project, with some addional components like hall sensor, IMU sensor etc to provide an interface for light and device control.
 
 ## But why is it the Torch Light?
 
 Well, my kids like playing Minecraft, I like playing Minecraft and when I saw this <img align="right" width="100" height="100" src="Docs/Media/minecraft-torch-toy.png">
-online, I just couldn't resist the impulsive buying and ordered a few. Now, I don't have anything against those lights, but when all you other lights in the house are controlled by [Home Assistant](https://www.home-assistant.io/) Zigbee integration, pressing the button to turn the lights on or off just didn't feel right and I knew from the begining, that I wanted these lights to be Zigbee. However, at this moment I've decided against cutting those lights open and instead decided to 3d print the [Minecraft Torch Nightlight][3d Source Torch Light] with a custom [torch head](3D%20Models/TBS2-Torch-head.stl) torch head to hold the TBS2 board. In the future, I need to find a replacement for TBS2. [BRD2601b](https://www.silabs.com/documents/public/user-guides/ug524-brd2601b-user-guide.pdf) is a tad expensive and supports Matter. Or maybe just build some custom board, because for now I just cannot find any other board that at least has an IMU and a microphone.
+online, I just couldn't resist the impulsive buying and ordered a few. Although there's nothing wrong with those lights, I felt that it didn't fit well with all the other
+lights in the house controlled by [Home Assistant](https://www.home-assistant.io/) Zigbee integration.
+That's when I decided these lights to be Zigbee enabled.
+However, instead of cutting open the lights, I opted to 3D print the [Minecraft Torch Nightlight][3d Source Torch Light] and designed a custom [torch head](3D%20Models/TBS2-Torch-Head.stl)
+torch head to hold the TBS2 board. In the future, I'll need to find a replacement for TBS2. Although, [BRD2601b](https://www.silabs.com/documents/public/user-guides/ug524-brd2601b-user-guide.pdf)
+supports Matter, it is a bit expensive. Alternatively, I might consider building a custom board because I haven't been able to find any other board that at least has an IMU and a microphone.
 
 ## Installation
 

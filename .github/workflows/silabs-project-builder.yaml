@@ -78,6 +78,16 @@ env:
   PROJECT_NAME: ${{ inputs.export_project_name == '' && inputs.project_name || inputs.export_project_name }}
   IS_NEW_PROJECT: ${{ inputs.export_project_name != '' && 'yes' || 'no' }}
   IS_BTL: ${{ startsWith(inputs.project_name, 'bootloader') && 'yes' || '' }}
+  branch_to_ota: >-
+    ${{ github.ref_name == 'main' 
+        && '0'
+        || (startsWith(github.ref_name, 'rc')
+            && '5'
+            || ( github.ref_name == 'dev'
+                 && '9'
+                 || '8')
+        )
+    }}
 
 jobs:
   firmware-build:
@@ -107,8 +117,9 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           LC_TIME=C META_DATE=$(git log -1 --format="%cd" --date=format:"%Y%m%d")
           BUILD_ID_MOD100=$(printf '%02d' $(expr $GITHUB_RUN_NUMBER % 100))  # 100 builds per day only
-          echo "OTA version: $META_DATE$BUILD_ID_MOD100"
-          echo "OTA_VERSION=$META_DATE$BUILD_ID_MOD100" >> "$GITHUB_OUTPUT"
+          OTA_VERSION="${META_DATE}${{ env.branch_to_ota }}${BUILD_ID_MOD100}"
+          echo "OTA version: '${OTA_VERSION}'"
+          echo "OTA_VERSION=${OTA_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Generate New Project
         if: env.IS_NEW_PROJECT == 'yes'

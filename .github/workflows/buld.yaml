@@ -22,6 +22,8 @@ on:
       - patches/
     branches:
       - main
+      - dev
+      - 'rc-*'
     tags:
       - '*'
 

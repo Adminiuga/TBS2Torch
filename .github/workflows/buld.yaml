@@ -18,8 +18,8 @@ on:
       - .github/workflows/build.yaml
       - .github/workflows/app-btl-build.yaml
       - .github/workflows/silabs-project-builder.yaml
-      - TBS2Torch/
-      - patches/
+      - 'TBS2Torch/**'
+      - 'patches/**'
     branches:
       - main
       - dev

@@ -145,21 +145,6 @@ void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
                                      0,
                                      0,
                                      NULL);
-  // update basic cluster
-  uint8_t dateCode[16];
-  memset(dateCode, 0x00, sizeof(dateCode));
-  snprintf(&dateCode[1],
-           sizeof(dateCode) - 1,
-           "%d",
-           EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_FIRMWARE_VERSION);
-  dateCode[0] = strlen(&dateCode[1]);
-  EmberAfStatus status = emberAfWriteServerAttribute(emberAfPrimaryEndpoint(),
-                                                     ZCL_BASIC_CLUSTER_ID,
-                                                     ZCL_DATE_CODE_ATTRIBUTE_ID,
-                                                     dateCode,
-                                                     ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
-  sl_zigbee_app_debug_println("Updated date code attribute: 0x%02x", status);
-
   handlerRhtUpdate();
 }
 

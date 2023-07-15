@@ -85,7 +85,7 @@ To build the project locally the build container can be reused. Simply start the
 docker run --rm -it \
   --user builder \
   -v $(pwd):/build -v ~/.gitconfig:/home/builder/.gitconfig \
-  ghcr.ilio/adminiuga/silabs-project-builder:4.3.0
+  ghcr.io/adminiuga/silabs-project-builder:4.3.0
 ```
 
 Generate the project with

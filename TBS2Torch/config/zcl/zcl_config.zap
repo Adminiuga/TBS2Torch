@@ -18,15 +18,15 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "..\\..\\..\\..\\..\\SimplicityStudio\\SDKs\\gecko_sdk\\app\\zcl\\zcl-zap.json",
+      "path": "..\\..\\..\\..\\..\\..\\..\\..\\SiliconLabs\\SimplicityStudio\\v5\\developer\\adapter_packs\\zap\\resources\\app.asar\\zcl-builtin\\silabs\\zcl.json",
       "type": "zcl-properties",
       "category": "zigbee",
       "version": 1,
-      "description": "Zigbee Silabs ZCL data"
+      "description": "ZigbeePro test data"
     },
     {
       "pathRelativity": "relativeToZap",
-      "path": "..\\..\\..\\..\\..\\SimplicityStudio\\SDKs\\gecko_sdk\\protocol\\zigbee\\app\\framework\\gen-template\\gen-templates.json",
+      "path": "..\\..\\..\\..\\..\\..\\SimplicityStudio\\SDKs\\gecko_sdk\\protocol\\zigbee\\app\\framework\\gen-template\\gen-templates.json",
       "type": "gen-templates-json",
       "category": "zigbee",
       "version": "zigbee-v0"
@@ -221,7 +221,7 @@
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
-              "defaultValue": "0xFF",
+              "defaultValue": "0x00",
               "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -237,7 +237,7 @@
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
-              "defaultValue": "0xFF",
+              "defaultValue": "0x09",
               "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -269,7 +269,7 @@
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "https://github.com/Adminiuga/TBS2Torch",
               "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -285,7 +285,7 @@
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "uninitialized",
               "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -1139,22 +1139,6 @@
               "bounded": 0,
               "defaultValue": "0x0000",
               "reportable": 0,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "current frequency",
-              "code": 4,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 0,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0000",
-              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0

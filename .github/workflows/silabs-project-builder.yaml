@@ -88,6 +88,16 @@ env:
                  || '8')
         )
     }}
+  branch_to_build_type: >-
+    ${{ github.ref_name == 'main' 
+        && 'rel'
+        || (startsWith(github.ref_name, 'rc')
+            && 'rc'
+            || ( github.ref_name == 'dev'
+                 && 'dev'
+                 || 'unk')
+        )
+    }}
 
 jobs:
   firmware-build:
@@ -120,6 +130,28 @@ jobs:
           OTA_VERSION="${META_DATE}${{ env.branch_to_ota }}${BUILD_ID_MOD100}"
           echo "OTA version: '${OTA_VERSION}'"
           echo "OTA_VERSION=${OTA_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "BUILD_DATE=${META_DATE}" >> "$GITHUB_OUTPUT"
+          echo "BUILD_ID_MOD100=${BUILD_ID_MOD100}" >> "$GITHUB_OUTPUT"
+
+      - name: Update dateCode in ZAP config
+        if: ${{ env.IS_BTL != 'yes' }}
+        run: |
+          cd "${{ env.PROJECT_NAME }}/config/zcl"
+          cp "zcl_config.zap" "zcl_config.zap~"
+          FILTER='(. | .endpointTypes[].clusters[] | select(.name == "Basic") | .attributes[] | select(.code == 6)).defaultValue'
+          DATE_CODE="${{ steps.ota_version.outputs.BUILD_DATE}}.${{ env.branch_to_build_type }}.${{ steps.ota_version.outputs.BUILD_ID_MOD100 }}"
+          echo "Date Code = '${DATE_CODE}'"
+          jq "${FILTER} |= \"${DATE_CODE}\"" "zcl_config.zap~" > "zcl_config.zap"
+
+      - name: Update SWBuildId in ZAP config
+        if: ${{ env.IS_BTL != 'yes' }}
+        run: |
+          cd "${{ env.PROJECT_NAME }}/config/zcl"
+          cp "zcl_config.zap" "zcl_config.zap~"
+          FILTER='(. | .endpointTypes[].clusters[] | select(.name == "Basic") | .attributes[] | select(.code == 16384)).defaultValue'
+          SW_BUILD_ID="SHA1: $(echo ${{ github.sha }} | cut -c1-10)"
+          echo "Date Code = '${SW_BUILD_ID}'"
+          jq "${FILTER} |= \"${SW_BUILD_ID}\"" "zcl_config.zap~" > "zcl_config.zap"
 
       - name: Generate New Project
         if: env.IS_NEW_PROJECT == 'yes'

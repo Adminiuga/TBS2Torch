@@ -24,6 +24,7 @@ RUN \
        patch \
        python3 \
        unzip \
+       less \
     && apt-get clean
 
 # Install Simplicity Commander (unfortunately no stable URL available, this

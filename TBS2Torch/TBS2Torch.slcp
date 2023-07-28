@@ -39,9 +39,9 @@ source:
 - {path: handlers/rht.c}
 - {path: handlers/shaker.h}
 - {path: handlers/shaker.c}
-- {path: gecko_sdk_4.3.0/protocol/zigbee/app/framework/plugin/level-control/level-control.c}
+- {path: gecko_sdk_4.3.1/protocol/zigbee/app/framework/plugin/level-control/level-control.c}
 tag: [prebuilt_demo]
-sdk: {id: gecko_sdk, version: 4.3.0}
+sdk: {id: gecko_sdk, version: 4.3.1}
 toolchain_settings: []
 component:
 - {id: zigbee_ota_storage_simple_eeprom}

@@ -126,8 +126,9 @@ jobs:
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           LC_TIME=C META_DATE=$(git log -1 --format="%cd" --date=format:"%Y%m%d")
+          LC_TIME=C OTA_DATE=$(git log -1 --format="%cd" --date=format:"%y%m%d")
           BUILD_ID_MOD100=$(printf '%02d' $(expr $GITHUB_RUN_NUMBER % 100))  # 100 builds per day only
-          OTA_VERSION="${META_DATE}${{ env.branch_to_ota }}${BUILD_ID_MOD100}"
+          OTA_VERSION="${OTA_DATE}${{ env.branch_to_ota }}${BUILD_ID_MOD100}"
           echo "OTA version: '${OTA_VERSION}'"
           echo "OTA_VERSION=${OTA_VERSION}" >> "$GITHUB_OUTPUT"
           echo "BUILD_DATE=${META_DATE}" >> "$GITHUB_OUTPUT"

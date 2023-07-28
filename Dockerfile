@@ -1,9 +1,9 @@
-FROM debian:bullseye
+FROM debian:bookworm
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG GCC_ARM_VERSION="10.3-2021.10"
 ARG ZAP_TOOL_RELEASE="helloWorldTag"
-ARG GECKO_SDK_VERSION="v4.3.0"
+ARG GECKO_SDK_VERSION="v4.3.1"
 
 ARG USERNAME=builder
 ARG USER_UID=1000
@@ -20,7 +20,7 @@ RUN \
        jq \
        libgl1 \
        make \
-       openjdk-17-jre-headless \
+       default-jre-headless \
        patch \
        python3 \
        unzip \

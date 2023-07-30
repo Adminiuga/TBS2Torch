@@ -36,6 +36,10 @@ on:
         type: string
         default: Raz-1 Torch / TBS2
 
+      btl_version:
+        required: true
+        type: string
+
 
 jobs:
   app-firmware-build:
@@ -61,15 +65,19 @@ jobs:
     uses: ./.github/workflows/silabs-project-builder.yaml
     with:
       image_name: ${{ inputs.image_name }}
-      project_name: ${{ 
-          vars.btl_project_name != ''
-          && vars.btl_project_name
-          || 'bootloader-storage-spiflash-single'
+      project_name: >-
+        ${{ vars.btl_project_name != ''
+            && vars.btl_project_name
+            || 'bootloader-storage-spiflash-single'
         }}
-      src_project_path: ${{
+      src_project_path: >-
+        ${{
           vars.btl_template_path != ''
           && vars.btl_template_path
-          || '/gecko_sdk/platform/bootloader/sample-apps/Series-1'
+          || ( startsWith(inputs.device, 'EFR32MG1')
+               && '/gecko_sdk/platform/bootloader/sample-apps/Series-1'
+               || '/gecko_sdk/platform/bootloader/sample-apps/Series-2'
+              )
         }}
 
       export_project_name: "app_btl"
@@ -79,7 +87,7 @@ jobs:
         bootloader_compression_lzma
       configuration:  |
         BOOTLOADER_WRITE_DISABLE:1,
-        BOOTLOADER_VERSION_MAIN_CUSTOMER:3,
+        BOOTLOADER_VERSION_MAIN_CUSTOMER:${{ inputs.btl_version }},
         BTL_STORAGE_SPIFLASH_MACRONIX_MX25R8035F:1,
         BTL_STORAGE_SPIFLASH_MACRONIX_MX25R3235F:1,
         SLOT_OVERLAP_ENABLE:0,

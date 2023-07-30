@@ -89,3 +89,4 @@ jobs:
       board: ${{ matrix.board }}
       build_btl: ${{ github.event.inputs.build_btl != '' && inputs.build_btl || false }}
       image_name: ${{ needs.build-container.outputs.image_name }}
+      btl_version: ${{ vars.btl_version != '' && vars.btl_version || '4' }}

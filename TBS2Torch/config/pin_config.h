@@ -114,6 +114,17 @@
 // [PCNT2]$
 
 // $[PRS.CH0]
+// PRS CH0 on PC6
+#ifndef PRS_CH0_PORT                            
+#define PRS_CH0_PORT                             gpioPortC
+#endif
+#ifndef PRS_CH0_PIN                             
+#define PRS_CH0_PIN                              6
+#endif
+#ifndef PRS_CH0_LOC                             
+#define PRS_CH0_LOC                              8
+#endif
+
 // [PRS.CH0]$
 
 // $[PRS.CH1]

@@ -97,6 +97,7 @@ component:
 - {id: si70xx_driver}
 - {id: sensor_rht}
 - {id: imu_driver}
+- {from: raz1_custom_components, id: power_configuration_server}
 config_file:
 - {path: config/zcl/zcl_config.zap, directory: zcl}
 configuration:
@@ -119,4 +120,5 @@ ui_hints:
   highlight:
   - {path: '', focus: true}
   - {path: readme.html}
-
+sdk_extension:
+- {id: raz1_custom_components, version: 0.0.1}

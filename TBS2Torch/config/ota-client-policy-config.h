@@ -26,7 +26,7 @@
 // <o EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_FIRMWARE_VERSION> Firmware Version <1-4294967295>
 // <i> Default: 1
 // <i> This is the device's current firmware version, used when querying the OTA server about the next image to use for an upgrade.
-#define EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_FIRMWARE_VERSION   20230628
+#define EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_FIRMWARE_VERSION   230805000
 
 // <o EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION> Hardware Version <0-65535>
 // <i> Default: 0

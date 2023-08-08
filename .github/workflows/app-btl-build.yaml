@@ -57,6 +57,8 @@ jobs:
       sdkpatchpath: "patches/GeckoSDK"
       metadata_extra: "{}"
       ota_string: ${{ inputs.app_ota_string }}
+      sdk_extensions: |
+        "https://github.com/Adminiuga/Raz1_custom_components_extension"
 
 
   bootloader-build:

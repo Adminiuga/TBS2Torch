@@ -14,6 +14,7 @@
 #include "find-and-bind-target.h"
 
 #include "network.h"
+#include "app-global.h"
 
 #if defined(SL_CATALOG_LED0_PRESENT)
 #include "led-blink.h"
@@ -87,6 +88,7 @@ void emberAfStackStatusCallback(EmberStatus status)
         networkHandlerAttemptToJoin(false);
     }
   } else if (status == EMBER_NETWORK_UP) {
+    emberSetPowerDescriptor(ZDO_POWER_DESCRIPTOR);
     networkState.joinAttempt = 0;
     handlerLedBlinkCountedBlink(LED_BLINK_NETWORK_UP_COUNT, LED_BLINK_SHORT_MS, COMMISSIONING_STATUS_LED);
     // delay finding & binding if network fluctuates

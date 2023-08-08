@@ -17,4 +17,8 @@
 // Fade in transition time in 10th of sec
 #define FADEIN_TRANSITION_TIME 5*10
 
+#ifndef ZDO_POWER_DESCRIPTOR
+#define ZDO_POWER_DESCRIPTOR 0x0220
+#endif  // ZDO_POWER_DESCRIPTOR
+
 #endif /* CONFIG_APP_GLOBAL_H_ */

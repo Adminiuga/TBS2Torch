@@ -235,8 +235,8 @@
 
 #define SL_BATTERY_MONITOR_R_DIVIDER_R1_R2 (SL_BATTERY_MONITOR_R_DIVIDER_R1 \
                                             + SL_BATTERY_MONITOR_R_DIVIDER_R2)
-#define SL_BATTERY_MONITOR_R_DIVIDER_COEF  (SL_BATTERY_MONITOR_R_DIVIDER_R1_R2 \
-                                            / SL_BATTERY_MONITOR_R_DIVIDER_R2)
+#define SL_BATTERY_MONITOR_R_DIVIDER_COEF  SL_BATTERY_MONITOR_R_DIVIDER_R1_R2 \
+                                           / SL_BATTERY_MONITOR_R_DIVIDER_R2
 
 // <<< sl:start pin_tool >>>
 // <prs gpio=true > SL_BATTERY_MONITOR_TX_ACTIVE

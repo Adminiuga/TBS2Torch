@@ -77,6 +77,7 @@ void emberAfMainInitCallback(void)
   sl_status_t status = handlerHallInit();
   sl_zigbee_app_debug_println("Hall Sensor init status: 0x%02x", status);
   handlerShakerInit();
+  emberSetPowerDescriptor(ZDO_POWER_DESCRIPTOR);
 }
 
 /** @brief Post Attribute Change

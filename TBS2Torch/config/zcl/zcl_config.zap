@@ -205,7 +205,7 @@
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
-              "defaultValue": "0x00",
+              "defaultValue": "0x03",
               "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,

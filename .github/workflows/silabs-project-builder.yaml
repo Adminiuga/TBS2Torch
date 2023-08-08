@@ -141,7 +141,7 @@ jobs:
           for EXT_PATH in ${{ env.sdk_path }}/extension/*
           do
             echo "Trusting ${EXT_PATH}"
-            slc configuration trust -extpath "$EXT_PATH"
+            slc signature trust -extpath "$EXT_PATH"
           done
 
       - name: Generate OTA Version

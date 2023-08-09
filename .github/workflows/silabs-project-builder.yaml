@@ -138,6 +138,10 @@ jobs:
             echo "Clonining ${EXT}"
             git clone "$EXT"
           done
+
+      - name: Trust SDK Extenstions
+        if: ${{ inputs.sdk_extensions != '' }}
+        run: |
           for EXT_PATH in ${{ env.sdk_path }}/extension/*
           do
             echo "Trusting ${EXT_PATH}"

@@ -5,8 +5,8 @@
  *      Author: achetroi
  */
 
-#ifndef HANDLERS_LED_BLINK_H_
-#define HANDLERS_LED_BLINK_H_
+#ifndef HANDLERS_RZ_LED_BLINK_H_
+#define HANDLERS_RZ_LED_BLINK_H_
 
 /** @brief Turn the Activity LED off, for multiple LED control
  *
@@ -62,4 +62,4 @@ void handlerLedBlinkPatternBlink(uint8_t  count,
                                  uint8_t  length,
                                  uint16_t *pattern,
                                  uint8_t  ledIndex);
-#endif /* HANDLERS_LED_BLINK_H_ */
+#endif /* HANDLERS_RZ_LED_BLINK_H_ */

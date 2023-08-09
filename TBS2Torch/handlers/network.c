@@ -17,7 +17,7 @@
 #include "app-global.h"
 
 #if defined(SL_CATALOG_LED0_PRESENT)
-#include "led-blink.h"
+#include "rz_led_blink.h"
 #define COMMISSIONING_STATUS_LED 0
 #else // !SL_CATALOG_LED0_PRESENT
 #define handlerLedBlinkBlinkLedOn(time, led)

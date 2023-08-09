@@ -60,6 +60,12 @@ on:
         default: ''
         type: string
 
+      sdk_extensions:
+        required: false
+        description: List of SDK extensions git URLs
+        default: ''
+        type: string
+
     outputs:
       project_name:
         description: Name of the generated SLC project
@@ -98,6 +104,7 @@ env:
                  || 'unk')
         )
     }}
+  sdk_path: /gecko_sdk
 
 jobs:
   firmware-build:
@@ -119,6 +126,27 @@ jobs:
       - name: Adjust permission
         shell: bash
         run: chown -R builder .
+
+      - name: Install SDK Extenstions
+        if: ${{ inputs.sdk_extensions != '' }}
+        shell: bash
+        run: |
+          mkdir -p ${{ env.sdk_path }}/extension || true
+          cd ${{ env.sdk_path }}/extension
+          for EXT in ${{ inputs.sdk_extensions }}
+          do
+            echo "Clonining ${EXT}"
+            git clone "$EXT"
+          done
+
+      - name: Trust SDK Extenstions
+        if: ${{ inputs.sdk_extensions != '' }}
+        run: |
+          for EXT_PATH in ${{ env.sdk_path }}/extension/*
+          do
+            echo "Trusting ${EXT_PATH}"
+            slc signature trust -extpath "$EXT_PATH"
+          done
 
       - name: Generate OTA Version
         id: ota_version

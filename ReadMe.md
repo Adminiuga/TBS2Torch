@@ -120,6 +120,23 @@ popd
 
 Once the build is complete, the build artifacts are going to be in `./build/release` folder.
 
+## Using a Li Ion 18650 cell for power
+
+It is possible to use a LiIon 18650 cell for powering. Just find an appropriate battery holder
+and connect:
+
+| Header | Pin Number | Function | Connect to |
+| ---  | -- | ------ | -------- |
+| EXPA |  1 | Ground | Battery "-" |
+| EXPA |  7 | Battery Voltage Sense (PA6) | [Voltage Divider](https://en.wikipedia.org/wiki/Voltage_divider) for battery voltage sensing |
+| EXPB | 18 | 5V     | Battery "+" |
+
+The new version supports battery voltage and % charge remaining, assuming you are using a standard
+18650 cell. Since fully charged battery voltage exceeds 3.3V, you cannot feed it directly to header
+pin #7, but need to use a [volgage divider](https://en.wikipedia.org/wiki/Voltage_divider) to reduce the voltage. The current firmware is using 18K + 27K voltage divider (just because I had
+those resistor handy), if you change those, then you would need to update the resistor values in
+[config/sl_battery_monitor_config.h](./TBS2Torch/config/sl_battery_monitor_config.h) and recompile the firmware.
+
 [Reference Table]: #
 [Torch Light GH]: https://github.com/Adminiuga/TBS2Torch.git "TBS2 Torch Light Github Project"
 

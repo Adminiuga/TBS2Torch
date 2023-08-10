@@ -17,7 +17,7 @@
 #include "app-global.h"
 
 #if defined(SL_CATALOG_LED0_PRESENT)
-#include "led-blink.h"
+#include "rz_led_blink.h"
 #define COMMISSIONING_STATUS_LED 0
 #else // !SL_CATALOG_LED0_PRESENT
 #define handlerLedBlinkBlinkLedOn(time, led)
@@ -73,7 +73,7 @@ void emberAfStackStatusCallback(EmberStatus status)
   if (status == EMBER_NETWORK_DOWN) {
     sl_zigbee_event_set_inactive(&commissioning_led_event);
 
-    handlerLedBlinkBlinkLedOn(LED_BLINK_LONG_MS, COMMISSIONING_STATUS_LED);
+    rz_led_blink_blink_led_on(LED_BLINK_LONG_MS, COMMISSIONING_STATUS_LED);
     sl_zigbee_app_debug_print("Current Network State: SteeringInProgress: %x, ",
                               networkState.isCurrentlySteering);
     sl_zigbee_app_debug_print("JoinAttempt: %d, ",
@@ -90,7 +90,7 @@ void emberAfStackStatusCallback(EmberStatus status)
   } else if (status == EMBER_NETWORK_UP) {
     emberSetPowerDescriptor(ZDO_POWER_DESCRIPTOR);
     networkState.joinAttempt = 0;
-    handlerLedBlinkCountedBlink(LED_BLINK_NETWORK_UP_COUNT, LED_BLINK_SHORT_MS, COMMISSIONING_STATUS_LED);
+    rz_led_blink_counted(LED_BLINK_NETWORK_UP_COUNT, LED_BLINK_SHORT_MS, COMMISSIONING_STATUS_LED);
     // delay finding & binding if network fluctuates
     sl_zigbee_event_set_delay_ms(&finding_and_binding_event,
                                  FIND_AND_BIND_DELAY_MS);
@@ -148,9 +148,9 @@ void networkHandlersIndicateNetworkStatus(void)
 
   if (nwkState == EMBER_NO_NETWORK
       || nwkState == EMBER_JOINED_NETWORK_NO_PARENT) {
-      handlerLedBlinkBlinkLedOn(LED_BLINK_LONG_MS, COMMISSIONING_STATUS_LED);
+      rz_led_blink_blink_led_on(LED_BLINK_LONG_MS, COMMISSIONING_STATUS_LED);
   } else {
-      handlerLedBlinkCountedBlink(LED_BLINK_NETWORK_UP_COUNT,
+      rz_led_blink_counted(LED_BLINK_NETWORK_UP_COUNT,
                                   LED_BLINK_SHORT_MS,
                                   COMMISSIONING_STATUS_LED);
   }
@@ -174,7 +174,7 @@ static void commissioning_led_event_handler(sl_zigbee_event_t *event)
       if (identifyTime > 0) {
         // identify blink, each blink is 1s and blinker supports
         // up to 255 blinks. Break down identifyTime in number of blinks
-        handlerLedBlinkCountedBlink((uint8_t) identifyTime & 0x00ff,
+        rz_led_blink_counted((uint8_t) identifyTime & 0x00ff,
                                      LED_BLINK_IDENTIFY_MS,
                                      COMMISSIONING_STATUS_LED);
 
@@ -182,7 +182,7 @@ static void commissioning_led_event_handler(sl_zigbee_event_t *event)
                                      1000*2);
       } else {
           // turn off status led
-          handlerLedBlinkBlinkLedOff(0, COMMISSIONING_STATUS_LED);
+          rz_led_blink_blink_led_off(0, COMMISSIONING_STATUS_LED);
       }
   }
 }
@@ -207,7 +207,7 @@ static void networkSeekerJoinerHandler(sl_zigbee_event_t *event)
       status = emberAfPluginNetworkSteeringStart();
       sl_zigbee_app_debug_println("networkSeekerJoiner: Start status: 0x%02X",
                                   status);
-      handlerLedBlinkBlinkLedOn(LED_BLINK_LONG_MS, COMMISSIONING_STATUS_LED);
+      rz_led_blink_blink_led_on(LED_BLINK_LONG_MS, COMMISSIONING_STATUS_LED);
       break;
 
     default:
@@ -223,7 +223,7 @@ static void finding_and_binding_event_handler(sl_zigbee_event_t *event)
   if (networkState == EMBER_JOINED_NETWORK) {
     sl_zigbee_app_debug_println("Find and bind target start: 0x%02X",
                                 emberAfPluginFindAndBindTargetStart(emberAfPrimaryEndpoint()));
-    handlerLedBlinkCountedBlink(LED_BLINK_NETWORK_UP_COUNT,
+    rz_led_blink_counted(LED_BLINK_NETWORK_UP_COUNT,
                                 LED_BLINK_SHORT_MS,
                                 COMMISSIONING_STATUS_LED);
   } else {

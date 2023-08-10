@@ -30,8 +30,6 @@ source:
 - {path: handlers/color_cbs.h}
 - {path: handlers/color_cbs.c}
 - {path: config/app-global.h}
-- {path: handlers/led-blink.h}
-- {path: handlers/led-blink.c}
 - {path: handlers/hall.h}
 - {path: handlers/hall.c}
 - {path: handlers/hall-conn-manager.c}
@@ -98,6 +96,7 @@ component:
 - {id: sensor_rht}
 - {id: imu_driver}
 - {from: raz1_custom_components, id: power_configuration_server}
+- {from: raz1_custom_components, id: rz_led_blink}
 config_file:
 - {path: config/zcl/zcl_config.zap, directory: zcl}
 configuration:

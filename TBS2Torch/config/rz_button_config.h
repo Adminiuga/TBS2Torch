@@ -1,6 +1,6 @@
 /***************************************************************************//**
  * @file
- * @brief rz_button counted button press component
+ * @brief rz_button_config Config
  *******************************************************************************
  * # License
  * <b>Copyright 2023 Alexei Chetroi</b>
@@ -14,7 +14,7 @@
  * furnished to do so, subject to the following conditions:
  *   The above copyright notice and this permission notice shall be included in
  *   all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,44 +24,20 @@
  * SOFTWARE.
  ******************************************************************************/
 
-#include "af.h"
+#ifndef RZ_BUTTON_CONFIG_H
+#define RZ_BUTTON_CONFIG_H
 
-#include "rz_button.h"
+// <<< Use Configuration Wizard in Context Menu
 
-/* @brief Button short duration press callback
- *
- * @note Called for each short press of a button.
- *
- * @param button Button number
- */
-WEAK(void rz_button_short_press_cb(uint8_t button)) {
-}
+// <h> Counted Button Press configuration
 
-/* @brief Button short duration press callback
- *
- * @note Called for multiple short presses of a button
- *
- * @param button Button number
- * @param counter Button was pressed so many times in quick succession
- */
-WEAK(void rz_button_counted_short_press_cb(uint8_t button,
-                uint8_t counter)) {
-}
+// <o RZ_BUTTON_PRESS_TIMEOUT_MS> Counted short press timeout
+// <50..500:10>
+// <i> Default: 20
+// <i> The maximum blink pattern length
+#define RZ_BUTTON_PRESS_TIMEOUT_MS 700
 
-/* @brief Button medium duration press callback
- *
- * @note Called after repeated or single presses for a button
- *
- * @param button Button number
- */
-WEAK(void rz_button_medium_press_cb(uint8_t button)) {
-}
+// </h> end Counted Button Press config
+// <<< end of configuration section >>>
 
-/* @brief Button long duration press callback
- *
- * @note Called after repeated or single presses for a button
- *
- * @param button Button number
- */
-WEAK(void rz_button_long_press_cb(uint8_t button)) {
-}
+#endif // RZ_BUTTON_CONFIG_H

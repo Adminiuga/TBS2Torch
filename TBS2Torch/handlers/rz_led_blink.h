@@ -8,7 +8,6 @@
 #ifndef RZ_LED_BLINK_H_
 #define RZ_LED_BLINK_H_
 
-
 /** @brief Initialize LED Blink control
  *
  * @note This function will initialize led blinker
@@ -49,9 +48,7 @@ void rz_led_blink_blink_led_on(uint32_t timeMs, uint8_t ledIndex);
  * @param blinkTimeMs  The amount of time (in ms) the LED should be on and off
  * @param ledIndex The led number to blink
  */
-void rz_led_blink_counted(uint8_t count,
-                          uint16_t blinkTimeMs,
-                          uint8_t ledIndex);
+void rz_led_blink_counted(uint8_t count, uint16_t blinkTimeMs, uint8_t ledIndex);
 
 /** @brief Cause the activity LED to blink in a specified pattern, for multiple
  * LED control
@@ -67,8 +64,5 @@ void rz_led_blink_counted(uint8_t count,
  * is 20 unsigned 16 bit entries.
  * @param led The led number to blink.
  */
-void rz_led_blink_pattern(uint8_t  count,
-                          uint8_t  length,
-                          uint16_t *pattern,
-                          uint8_t  ledIndex);
+void rz_led_blink_pattern(uint8_t count, uint8_t length, uint16_t *pattern, uint8_t ledIndex);
 #endif /* RZ_LED_BLINK_H_ */

@@ -1,11 +1,28 @@
-/*
- * led-blink.c
+/*******************************************************************************
+ * @file
+ * @brief API to blink simple led instances
+ *******************************************************************************
+ * # License
+ * <b>Copyright 2023 Alexei Chetroi</b>
+ *******************************************************************************
  *
- * API to blink control simple led instances
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *   The above copyright notice and this permission notice shall be included in
+ *   all copies or substantial portions of the Software.
  *
- *  Created on: Jun 4, 2023
- *      Author: achetroi
- */
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ ******************************************************************************/
 
 #include "sl_component_catalog.h"
 
@@ -61,7 +78,16 @@ static void handlerLedBlinkLedEventHandler(uint8_t ledIndex);
 static void handlerLedBlinkLed0EventHandler(sl_zigbee_event_t *event);
 #endif
 #if SL_SIMPLE_LED_COUNT >= 2
-static void handlerLedBlinkLed0EventHandler(sl_zigbee_event_t *event);
+static void handlerLedBlinkLed1EventHandler(sl_zigbee_event_t *event);
+#endif
+#if SL_SIMPLE_LED_COUNT >= 3
+static void handlerLedBlinkLed2EventHandler(sl_zigbee_event_t *event);
+#endif
+#if SL_SIMPLE_LED_COUNT >= 4
+static void handlerLedBlinkLed3EventHandler(sl_zigbee_event_t *event);
+#endif
+#if SL_SIMPLE_LED_COUNT >= 5
+static void handlerLedBlinkLed4EventHandler(sl_zigbee_event_t *event);
 #endif
 static void _blinkLedOnOrOff(uint32_t timeMs, uint8_t ledIndex, ledState_t ledState);
 static void _blinkPatternHandler(uint8_t ledIndex);
@@ -85,6 +111,15 @@ void rz_led_blink_init(void) {
 #endif
 #if SL_SIMPLE_LED_COUNT >= 2
   sl_zigbee_event_init(Event(1), handlerLedBlinkLed1EventHandler);
+#endif
+#if SL_SIMPLE_LED_COUNT >= 3
+  sl_zigbee_event_init(Event(2), handlerLedBlinkLed2EventHandler);
+#endif
+#if SL_SIMPLE_LED_COUNT >= 4
+  sl_zigbee_event_init(Event(3), handlerLedBlinkLed3EventHandler);
+#endif
+#if SL_SIMPLE_LED_COUNT >= 5
+  sl_zigbee_event_init(Event(4), handlerLedBlinkLed4EventHandler);
 #endif
 
     isInitialized = true;
@@ -157,6 +192,27 @@ static void handlerLedBlinkLed1EventHandler(sl_zigbee_event_t *event)
 }
 #endif
 
+#if SL_SIMPLE_LED_COUNT >= 3
+static void handlerLedBlinkLed2EventHandler(sl_zigbee_event_t *event)
+{
+  handlerLedBlinkLedEventHandler(2);
+}
+#endif
+
+#if SL_SIMPLE_LED_COUNT >= 4
+static void handlerLedBlinkLed3EventHandler(sl_zigbee_event_t *event)
+{
+  handlerLedBlinkLedEventHandler(3);
+}
+#endif
+
+#if SL_SIMPLE_LED_COUNT >= 5
+static void handlerLedBlinkLed4EventHandler(sl_zigbee_event_t *event)
+{
+  handlerLedBlinkLedEventHandler(4);
+}
+#endif
+
 /** @brief handle blinking events
  * @note  The API to turn the light on can be used to either change the LED state to
  * a permanent on state, or to flash the LED on temporarily after which time
@@ -172,7 +228,7 @@ static void handlerLedBlinkLed1EventHandler(sl_zigbee_event_t *event)
  * @param ledIndex which led to handle event for
  */
 static void handlerLedBlinkLedEventHandler(uint8_t ledIndex) {
-    // currently only 2 leds are supported
+    // currently only 5 leds are supported
     if (ledIndex >= MAX_SUPPORTED_LED_COUNT)
         return;
 

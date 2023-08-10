@@ -22,9 +22,9 @@ source:
 - {path: hw/drivers.h}
 - {path: hw/drivers.c}
 - {path: hw/hw-config.h}
-- {path: handlers/buttons.h}
-- {path: handlers/buttons.c}
-- {path: handlers/buttons-cb.c}
+- {path: handlers/rz_button.h}
+- {path: handlers/rz_button.c}
+- {path: handlers/rz_button-cb.c}
 - {path: handlers/network.h}
 - {path: handlers/network.c}
 - {path: handlers/color_cbs.h}
@@ -97,6 +97,7 @@ component:
 - {id: imu_driver}
 - {from: raz1_custom_components, id: power_configuration_server}
 - {from: raz1_custom_components, id: rz_led_blink}
+- {from: raz1_custom_components, id: rz_button_press}
 config_file:
 - {path: config/zcl/zcl_config.zap, directory: zcl}
 configuration:

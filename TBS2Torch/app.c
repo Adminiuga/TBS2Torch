@@ -186,7 +186,7 @@ void handlerShakerShakingStop(uint32_t durationMs) {
  * @param button Button number
  * @param pressedTimes Button was pressed so many times in quick succession
  */
-void handlerButtonShortPressCallback(uint8_t button)
+void rz_button_short_press_cb(uint8_t button)
 {
   sl_zigbee_app_debug_println("Short button press hander for button %d",
                               button);
@@ -227,7 +227,7 @@ static void btn1_short_press_handler()
  *
  * @param button Button number
  */
-void handlerButtonMediumPressCallback(uint8_t button)
+void rz_button_medium_press_cb(uint8_t button)
 {
   sl_zigbee_app_debug_println("Medium duration button press hander for button %d",
                               button);
@@ -336,7 +336,7 @@ static void btn0_medium_press_handler(void)
  *
  * @param button Button number
  */
-void handlerButtonLongPressCallback(uint8_t button)
+void rz_button_long_press_cb(uint8_t button)
 {
   sl_zigbee_app_debug_println("Long duration button press hander for button %d",
                               button);

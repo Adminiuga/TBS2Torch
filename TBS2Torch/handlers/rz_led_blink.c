@@ -57,7 +57,6 @@ static sl_zigbee_event_t blinkEvent[SL_SIMPLE_LED_COUNT];
 
 // ------------------------------------------------------------------------------
 // Forward declaration of private functions
-static void handlerLedBlinkInit(void);
 static void handlerLedBlinkLedEventHandler(uint8_t ledIndex);
 #if SL_SIMPLE_LED_COUNT >= 1
 static void handlerLedBlinkLed0EventHandler(sl_zigbee_event_t *event);
@@ -73,20 +72,42 @@ static void _blinkPatternHandler(uint8_t ledIndex);
 
 // ------------------------------------------------------------------------------
 // public functions implementation
-void handlerLedBlinkBlinkLedOff(uint32_t timeMs, uint8_t ledIndex)
+/** @brief Initialize handler
+ * @note Initialize Events to handle blinker events
+ *******************************************************************************/
+void rz_led_blink_init(void)
+{
+  if (isInitialized) return;
+
+  for (uint8_t i = 0; i < SL_SIMPLE_LED_COUNT; i++) {
+     blinkState[i].ledState = LED_OFF;
+     blinkState[i].count = 0;
+  }
+
+#if SL_SIMPLE_LED_COUNT >= 1
+  sl_zigbee_event_init(Event(0), handlerLedBlinkLed0EventHandler);
+#endif
+#if SL_SIMPLE_LED_COUNT >= 2
+  sl_zigbee_event_init(Event(1), handlerLedBlinkLed1EventHandler);
+#endif
+
+  isInitialized = true;
+};
+
+void rz_led_blink_blink_led_off(uint32_t timeMs, uint8_t ledIndex)
 {
   _blinkLedOnOrOff(timeMs, ledIndex, LED_OFF);
 };
 
-void handlerLedBlinkBlinkLedOn(uint32_t timeMs, uint8_t ledIndex)
+void rz_led_blink_blink_led_on(uint32_t timeMs, uint8_t ledIndex)
 {
   _blinkLedOnOrOff(timeMs, ledIndex, LED_ON);
 };
 
-void handlerLedBlinkCountedBlink(uint8_t count, uint16_t blinkTimeMs, uint8_t ledIndex)
+void rz_led_blink_counted(uint8_t count, uint16_t blinkTimeMs, uint8_t ledIndex)
 {
   if (ledIndex >= MAX_SUPPORTED_LED_COUNT) return;
-  if (!isInitialized) handlerLedBlinkInit();
+  if (!isInitialized) rz_led_blink_init();
 
   blinkState[ledIndex].timeMs = blinkTimeMs;
   led_turn_off(ledIndex);
@@ -96,14 +117,14 @@ void handlerLedBlinkCountedBlink(uint8_t count, uint16_t blinkTimeMs, uint8_t le
   blinkState[ledIndex].count = count;
 }
 
-void handlerLedBlinkPatternBlink(uint8_t  count,
+void rz_led_blink_pattern(uint8_t  count,
                                  uint8_t  length,
                                  uint16_t *pattern,
                                  uint8_t  ledIndex)
 {
   if (ledIndex >= MAX_SUPPORTED_LED_COUNT
       || length < 2) return;
-  if (!isInitialized) handlerLedBlinkInit();
+  if (!isInitialized) rz_led_blink_init();
 
    led_turn_on(ledIndex);
 
@@ -129,28 +150,6 @@ void handlerLedBlinkPatternBlink(uint8_t  count,
 
 // ------------------------------------------------------------------------------
 // private functions implementation
-/** @brief Initialize handler
- * @note Initialize Events to handle blinker events
- *******************************************************************************/
-static void handlerLedBlinkInit(void)
-{
-  if (isInitialized) return;
-
-  for (uint8_t i = 0; i < SL_SIMPLE_LED_COUNT; i++) {
-     blinkState[i].ledState = LED_OFF;
-     blinkState[i].count = 0;
-  }
-
-#if SL_SIMPLE_LED_COUNT >= 1
-  sl_zigbee_event_init(Event(0), handlerLedBlinkLed0EventHandler);
-#endif
-#if SL_SIMPLE_LED_COUNT >= 2
-  sl_zigbee_event_init(Event(1), handlerLedBlinkLed1EventHandler);
-#endif
-
-  isInitialized = true;
-};
-
 
 #if SL_SIMPLE_LED_COUNT >= 1
 static void handlerLedBlinkLed0EventHandler(sl_zigbee_event_t *event)
@@ -275,7 +274,7 @@ static void _blinkLedOnOrOff(uint32_t timeMs,
                              ledState_t ledState)
 {
   if (ledIndex >= MAX_SUPPORTED_LED_COUNT) return;
-  if (!isInitialized) handlerLedBlinkInit();
+  if (!isInitialized) rz_led_blink_init();
 
   if (LED_ON == ledState) {
     led_turn_on(ledIndex);
@@ -293,10 +292,10 @@ static void _blinkLedOnOrOff(uint32_t timeMs,
 
 
 #else // !SL_CATALOG_SIMPLE_LED_PRESENT
-void handlerLedBlinkBlinkLedOff(uint32_t timeMs, uint8_t ledIndex) {}
-void handlerLedBlinkBlinkLedOn(uint32_t timeMs, uint8_t ledIndex) {}
-void handlerLedBlinkCountedBlink(uint8_t count, uint16_t blinkTimeMs, uint8_t ledIndex) {}
-void handlerLedBlinkPatternBlink(uint8_t  count,
+void rz_led_blink_blink_led_off(uint32_t timeMs, uint8_t ledIndex) {}
+void rz_led_blink_blink_led_on(uint32_t timeMs, uint8_t ledIndex) {}
+void rz_led_blink_counted(uint8_t count, uint16_t blinkTimeMs, uint8_t ledIndex) {}
+void rz_led_blink_pattern(uint8_t  count,
                                  uint8_t  length,
                                  uint16_t *pattern,
                                  uint8_t  ledIndex) {}

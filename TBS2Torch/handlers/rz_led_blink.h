@@ -5,8 +5,15 @@
  *      Author: achetroi
  */
 
-#ifndef HANDLERS_RZ_LED_BLINK_H_
-#define HANDLERS_RZ_LED_BLINK_H_
+#ifndef RZ_LED_BLINK_H_
+#define RZ_LED_BLINK_H_
+
+
+/** @brief Initialize LED Blink control
+ *
+ * @note This function will initialize led blinker
+ */
+void rz_led_blink_init(void);
 
 /** @brief Turn the Activity LED off, for multiple LED control
  *
@@ -18,7 +25,7 @@
  * will remain off indefinitely.
  * @param ledIndex The led number to be turned off.
  */
-void handlerLedBlinkBlinkLedOff(uint32_t timeMs, uint8_t ledIndex);
+void rz_led_blink_blink_led_off(uint32_t timeMs, uint8_t ledIndex);
 
 /** @brief Turn the Activity LED on, for multiple LED control
  *
@@ -30,7 +37,7 @@ void handlerLedBlinkBlinkLedOff(uint32_t timeMs, uint8_t ledIndex);
  * will remain on indefinitely.
  * @param ledIndex The led to be turned on.
  */
-void handlerLedBlinkBlinkLedOn(uint32_t timeMs, uint8_t ledIndex);
+void rz_led_blink_blink_led_on(uint32_t timeMs, uint8_t ledIndex);
 
 /** @brief Set the activity LED to blink a given number of times, for multiple
  * LED control
@@ -42,7 +49,9 @@ void handlerLedBlinkBlinkLedOn(uint32_t timeMs, uint8_t ledIndex);
  * @param blinkTimeMs  The amount of time (in ms) the LED should be on and off
  * @param ledIndex The led number to blink
  */
-void handlerLedBlinkCountedBlink(uint8_t count, uint16_t blinkTimeMs, uint8_t ledIndex);
+void rz_led_blink_counted(uint8_t count,
+                          uint16_t blinkTimeMs,
+                          uint8_t ledIndex);
 
 /** @brief Cause the activity LED to blink in a specified pattern, for multiple
  * LED control
@@ -58,8 +67,8 @@ void handlerLedBlinkCountedBlink(uint8_t count, uint16_t blinkTimeMs, uint8_t le
  * is 20 unsigned 16 bit entries.
  * @param led The led number to blink.
  */
-void handlerLedBlinkPatternBlink(uint8_t  count,
-                                 uint8_t  length,
-                                 uint16_t *pattern,
-                                 uint8_t  ledIndex);
-#endif /* HANDLERS_RZ_LED_BLINK_H_ */
+void rz_led_blink_pattern(uint8_t  count,
+                          uint8_t  length,
+                          uint16_t *pattern,
+                          uint8_t  ledIndex);
+#endif /* RZ_LED_BLINK_H_ */

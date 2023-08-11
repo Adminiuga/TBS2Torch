@@ -20,10 +20,10 @@
 #include "rz_led_blink.h"
 #define COMMISSIONING_STATUS_LED 0
 #else // !SL_CATALOG_LED0_PRESENT
-#define handlerLedBlinkBlinkLedOn(time, led)
-#define handlerLedBlinkBlinkLedOff(time, led)
-#define handlerLedBlinkCountedBlink(count, time, led)
-#define handlerLedBlinkPatternBlink(count, length, pattern, ledIndex)
+#define rz_led_blink_blink_led_on(time, led)
+#define rz_led_blink_blink_led_off(time, led)
+#define rz_led_blink_counted(count, time, led)
+#define rz_led_blink_pattern(count, length, pattern, ledIndex)
 #endif // SL_CATALOG_LED0_PRESENT
 
 

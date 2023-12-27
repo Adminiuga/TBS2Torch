@@ -2,7 +2,7 @@ FROM debian:bookworm
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG GCC_ARM_VERSION="10.3-2021.10"
-ARG ZAP_TOOL_RELEASE="helloWorldTag"
+ARG ZAP_TOOL_RELEASE="v2023.12.07"
 ARG GECKO_SDK_VERSION="v4.4.0"
 
 ARG USERNAME=builder
@@ -59,7 +59,7 @@ ENV PATH="$PATH:/opt/gcc-arm-none-eabi-${GCC_ARM_VERSION}/bin"
 
 # Install ZAP adapter
 RUN \
-    curl -OL https://github.com/SiliconLabs/zap/releases/download/${ZAP_TOOL_RELEASE}/zap-linux-x64.zip \
+    curl -OL https://github.com/project-chip/zap/releases/download/${ZAP_TOOL_RELEASE}/zap-linux-x64.zip \
     && umask 022 \
     && unzip -d /opt/zap zap-linux-x64.zip \
     && rm zap-linux-x64.zip

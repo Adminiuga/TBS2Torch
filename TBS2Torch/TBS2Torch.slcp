@@ -56,7 +56,6 @@ component:
 - {id: zigbee_end_device_support}
 - {id: zigbee_application_bootloader}
 - {id: zigbee_color_control_server}
-- {id: zigbee_binding_table}
 - {id: EFR32MG12P332F1024GL125}
 - {id: iostream_recommended_stream}
 - {id: zigbee_scenes}
@@ -88,8 +87,6 @@ component:
 - {id: zigbee_r22_support}
 - {id: zigbee_debug_print}
 - {id: zigbee_reporting}
-- {id: zigbee_install_code}
-- {id: zigbee_update_tc_link_key}
 - {id: si7210_driver}
 - {id: sensor_hall}
 - {id: si70xx_driver}

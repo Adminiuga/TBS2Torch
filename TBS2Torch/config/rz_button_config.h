@@ -32,8 +32,8 @@
 // <h> Counted Button Press configuration
 
 // <o RZ_BUTTON_PRESS_TIMEOUT_MS> Counted short press timeout
-// <50..500:10>
-// <i> Default: 20
+// <100..2000:50>
+// <i> Default: 750
 // <i> The maximum blink pattern length
 #define RZ_BUTTON_PRESS_TIMEOUT_MS 700
 

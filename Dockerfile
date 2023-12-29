@@ -1,7 +1,7 @@
 FROM debian:bookworm
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG GCC_ARM_VERSION="10.3-2021.10"
+ARG GCC_ARM_VERSION="12.3.rel1"
 ARG ZAP_TOOL_RELEASE="v2023.12.07"
 ARG GECKO_SDK_VERSION="v4.4.0"
 
@@ -24,6 +24,7 @@ RUN \
        patch \
        python3 \
        unzip \
+       xz-utils \
        less \
     && apt-get clean
 
@@ -50,12 +51,11 @@ ENV PATH="$PATH:/opt/slc_cli"
 
 # Install ARM GCC embedded toolchain
 RUN \
-    curl -O https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/${GCC_ARM_VERSION}/gcc-arm-none-eabi-${GCC_ARM_VERSION}-x86_64-linux.tar.bz2 \
-    && tar -C /opt -xjf gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2 \
-    && rm gcc-arm-none-eabi-${GCC_ARM_VERSION}-x86_64-linux.tar.bz2
+    curl -L -O https://developer.arm.com/-/media/Files/downloads/gnu/${GCC_ARM_VERSION}/binrel/arm-gnu-toolchain-${GCC_ARM_VERSION}-x86_64-arm-none-eabi.tar.xz \
+    && xzcat arm-gnu-toolchain-${GCC_ARM_VERSION}-x86_64-arm-none-eabi.tar.xz | tar -C /opt -xf -\
+    && rm arm-gnu-toolchain-${GCC_ARM_VERSION}-x86_64-arm-none-eabi.tar.xz
 
-ENV PATH="$PATH:/opt/gcc-arm-none-eabi-${GCC_ARM_VERSION}/bin"
-
+ENV PATH="$PATH:/opt/arm-gnu-toolchain-${GCC_ARM_VERSION}-x86_64-arm-none-eabi/bin"
 
 # Install ZAP adapter
 RUN \
@@ -84,4 +84,5 @@ RUN \
     slc configuration --sdk="/gecko_sdk/" \
     && slc signature trust --sdk "/gecko_sdk/" \
     && slc configuration \
-           --gcc-toolchain="/opt/gcc-arm-none-eabi-${GCC_ARM_VERSION}/"
+           --gcc-toolchain="/opt/arm-gnu-toolchain-${GCC_ARM_VERSION}-x86_64-arm-none-eabi/"
+

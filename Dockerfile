@@ -65,6 +65,7 @@ RUN \
     && rm zap-linux-x64.zip
 
 ENV STUDIO_ADAPTER_PACK_PATH="/opt/zap:/opt/commander"
+ENV POST_BUILD_EXE="/opt/commander/commander"
 
 
 RUN \

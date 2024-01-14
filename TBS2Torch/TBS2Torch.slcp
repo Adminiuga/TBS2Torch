@@ -37,9 +37,9 @@ source:
 - {path: handlers/rht.c}
 - {path: handlers/shaker.h}
 - {path: handlers/shaker.c}
-- {path: gecko_sdk_4.3.1/protocol/zigbee/app/framework/plugin/level-control/level-control.c}
+- {path: gecko_sdk_4.4.0/protocol/zigbee/app/framework/plugin/level-control/level-control.c}
 tag: [prebuilt_demo]
-sdk: {id: gecko_sdk, version: 4.3.1}
+sdk: {id: gecko_sdk, version: 4.4.0}
 toolchain_settings: []
 component:
 - {id: zigbee_ota_storage_simple_eeprom}
@@ -56,7 +56,6 @@ component:
 - {id: zigbee_end_device_support}
 - {id: zigbee_application_bootloader}
 - {id: zigbee_color_control_server}
-- {id: zigbee_binding_table}
 - {id: EFR32MG12P332F1024GL125}
 - {id: iostream_recommended_stream}
 - {id: zigbee_scenes}
@@ -88,8 +87,6 @@ component:
 - {id: zigbee_r22_support}
 - {id: zigbee_debug_print}
 - {id: zigbee_reporting}
-- {id: zigbee_install_code}
-- {id: zigbee_update_tc_link_key}
 - {id: si7210_driver}
 - {id: sensor_hall}
 - {id: si70xx_driver}

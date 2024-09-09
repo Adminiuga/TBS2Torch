@@ -214,15 +214,15 @@ jobs:
               --copy-sdk-sources \
               --configuration="${{ inputs.configuration }}"
 
-      - name: Patch SDK
-        if: "${{ inputs.sdkpatchpath != '' }}"
-        run: |
-          cd ${{ env.PROJECT_NAME }}/gecko_sdk_${{ inputs.sdk_version }}
-          for patch in "../../${{ inputs.sdkpatchpath }}"/*.patch
-          do
-              echo "Applying ${patch}"
-              test -r $patch && patch -p1 < $patch
-          done
+#      - name: Patch SDK
+#        if: "${{ inputs.sdkpatchpath != '' }}"
+#        run: |
+#          cd ${{ env.PROJECT_NAME }}/gecko_sdk_${{ inputs.sdk_version }}
+#          for patch in "../../${{ inputs.sdkpatchpath }}"/*.patch
+#          do
+#              echo "Applying ${patch}"
+#              test -r $patch && patch -p1 < $patch
+#          done
 
       - name: Update OTA version
         if: ${{ env.IS_BTL != 'yes' }}

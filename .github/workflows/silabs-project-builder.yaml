@@ -221,7 +221,7 @@ jobs:
           for patch in "../../${{ inputs.sdkpatchpath }}"/*.patch
           do
               echo "Applying ${patch}"
-              patch -p1 < $patch
+              test -r $patch && patch -p1 < $patch
           done
 
       - name: Update OTA version

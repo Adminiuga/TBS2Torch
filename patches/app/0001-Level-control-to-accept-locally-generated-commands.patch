@@ -1,7 +1,7 @@
-From b865fa9690d0ab0889a593f481ec6775c075ae05 Mon Sep 17 00:00:00 2001
+From e3a72870f4762ac38455a1aa3c3f28b16016874e Mon Sep 17 00:00:00 2001
 From: Alexei Chetroi <Alexei.Chetroi@outlook.com>
-Date: Wed, 27 Dec 2023 12:20:48 -0500
-Subject: [PATCH] Custom commands for level cluster
+Date: Sat, 7 Sep 2024 22:33:08 -0400
+Subject: [PATCH] Torch level cluster patch
 
 ---
  .../plugin/level-control/level-control.c      | 30 +++++++++++++++----

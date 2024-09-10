@@ -122,7 +122,7 @@ jobs:
       ota_version: ${{ steps.ota_version.outputs.ota_version }}
 
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4
       - name: Adjust permission
         shell: bash
         run: chown -R builder .
@@ -319,7 +319,7 @@ jobs:
               --tag-id 0x0000 \
               --tag-file "${{ env.PROJECT_NAME}}.gbl"
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: (success() || failure()) && env.IS_BTL != 'yes'
         name: Upload application firmware
         with:
@@ -330,7 +330,7 @@ jobs:
             ${{ env.PROJECT_NAME }}/build/release/*.hex
             ${{ env.PROJECT_NAME }}/build/release/*.ota
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: (success() || failure()) && env.IS_BTL == 'yes'
         name: Upload bootloader firmware
         with:
@@ -339,7 +339,7 @@ jobs:
             ${{ env.PROJECT_NAME }}/artifact/version.json
             ${{ env.PROJECT_NAME }}/artifact/*.s37
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: (success() || failure()) && vars.ARTIFACT_UPLOAD_SOURCES != ''
         name: Upload generated project sources
         with:

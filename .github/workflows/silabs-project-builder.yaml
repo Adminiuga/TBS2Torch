@@ -62,7 +62,7 @@ on:
 
       sdk_extensions:
         required: false
-        description: List of SDK extensions git URLs
+        description: 'List of SDK extensions git URLs. an URL with #tag_name will use a specific tag/branch name'
         default: ''
         type: string
 
@@ -127,7 +127,7 @@ jobs:
         shell: bash
         run: chown -R builder .
 
-      - name: Install SDK Extenstions
+      - name: Install and Trust the SDK Extenstions
         if: ${{ inputs.sdk_extensions != '' }}
         shell: bash
         run: |
@@ -135,8 +135,17 @@ jobs:
           cd ${{ env.sdk_path }}/extension
           for EXT in ${{ inputs.sdk_extensions }}
           do
-            echo "Clonining ${EXT}"
-            git clone "$EXT"
+            if [ "$EXT" == "*#*" ]
+            then
+              URL="part1="${EXT%%#*}"
+              tag="${EXT#*#}""
+              echo "Clonining ${URL} with '${TAG}' tag"
+              git clone --depth 1 -b "${TAG}" "$URL"
+            else
+              EXT=$(echo $EXT | cut -d'#' -f1)
+              echo "Clonining ${EXT}"
+              git clone --depth 1 "$EXT"
+            fi
           done
 
       - name: Trust SDK Extenstions

@@ -67,8 +67,8 @@ jobs:
           context: .
           file: Dockerfile
           tags: ghcr.io/${{ steps.lower.outputs.repository_owner }}/silabs-project-builder:${{ env.sdk_version }}
-          cache-from: ghcr.io/${{ steps.lower.outputs.repository_owner }}/silabs-project-builder:cache-${{ env.sdk_version }}
-          cache-to: ghcr.io/${{ steps.lower.outputs.repository_owner }}/silabs-project-builder:cache-${{ env.sdk_version }}
+          cache-from: ghcr.io/${{ steps.lower.outputs.repository_owner }}/silabs-project-builder:cache-${{ env.sdk_version }}-${{ env.gcc_version }}-${{ env.zap_version}}
+          cache-to: ghcr.io/${{ steps.lower.outputs.repository_owner }}/silabs-project-builder:cache-${{ env.sdk_version }}-${{ env.gcc_version }}-${{ env.zap_version}}
           push: true
           build-args:
             "GECKO_SDK_VERSION=v${{ env.sdk_version }}"

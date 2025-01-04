@@ -39,62 +39,62 @@ source:
 - {path: handlers/shaker.c}
 - {path: gecko_sdk_4.4.4/protocol/zigbee/app/framework/plugin/level-control/level-control.c}
 tag: [prebuilt_demo]
-sdk: {id: gecko_sdk, version: 4.4.4}
+sdk: {id: gecko_sdk, version: 4.4.5}
 toolchain_settings: []
 component:
-- {id: zigbee_ota_storage_simple_eeprom}
-- {id: zigbee_ota_client}
-- {id: slot_manager}
-- instance: [btn0, btn1]
-  id: simple_button
-- {id: power_manager_deepsleep}
+- {from: raz1_custom_components, id: power_configuration_server}
+- {from: raz1_custom_components, id: rz_button_press}
+- {from: raz1_custom_components, id: rz_led_blink}
+- {id: EFR32MG12P332F1024GL125}
+- {id: app_button_press}
+- {id: brd4166a}
+- {id: brd4166a_support}
 - instance: [example]
   id: cli
-- {id: brd4166a}
-- {id: zigbee_ota_client_policy}
-- {id: zigbee_pro_leaf_stack}
-- {id: zigbee_end_device_support}
-- {id: zigbee_application_bootloader}
-- {id: zigbee_color_control_server}
-- {id: EFR32MG12P332F1024GL125}
+- {id: imu_driver}
 - {id: iostream_recommended_stream}
-- {id: zigbee_scenes}
-- {id: zigbee_gp}
+- {id: power_manager_deepsleep}
+- {id: sensor_hall}
+- {id: sensor_rht}
+- {id: si70xx_driver}
+- {id: si7210_driver}
+- instance: [btn0, btn1]
+  id: simple_button
 - instance: [led0]
   id: simple_led
-- {id: zigbee_zcl_framework_core}
-- {id: zigbee_stack_diagnostics}
-- {id: zigbee_network_steering}
-- {id: zigbee_find_and_bind_target}
-- {id: zigbee_zll_scenes_server}
-- {id: brd4166a_support}
-- {id: zigbee_level_control}
-- {id: zigbee_counters}
-- {id: zigbee_identify}
-- {id: zigbee_green_power_common}
 - instance: [rgb_led0]
   id: simple_rgb_pwm_led
+- {id: slot_manager}
+- {id: zigbee_application_bootloader}
 - {id: zigbee_basic}
-- {id: zigbee_ota_storage_simple}
-- {id: app_button_press}
-- {id: zigbee_zll_on_off_server}
-- {id: zigbee_ota_bootload}
-- {id: zigbee_green_power_client}
-- {id: zigbee_scan_dispatch}
-- {id: zigbee_groups_server}
-- {id: zigbee_zll}
-- {id: zigbee_on_off}
-- {id: zigbee_r22_support}
+- {id: zigbee_color_control_server}
+- {id: zigbee_counters}
 - {id: zigbee_debug_print}
+- {id: zigbee_end_device_support}
+- {id: zigbee_find_and_bind_target}
+- {id: zigbee_gp}
+- {id: zigbee_green_power_client}
+- {id: zigbee_green_power_common}
+- {id: zigbee_groups_server}
+- {id: zigbee_identify}
+- {id: zigbee_level_control}
+- {id: zigbee_network_steering}
+- {id: zigbee_on_off}
+- {id: zigbee_ota_bootload}
+- {id: zigbee_ota_client}
+- {id: zigbee_ota_client_policy}
+- {id: zigbee_ota_storage_simple}
+- {id: zigbee_ota_storage_simple_eeprom}
+- {id: zigbee_pro_leaf_stack}
+- {id: zigbee_r22_support}
 - {id: zigbee_reporting}
-- {id: si7210_driver}
-- {id: sensor_hall}
-- {id: si70xx_driver}
-- {id: sensor_rht}
-- {id: imu_driver}
-- {from: raz1_custom_components, id: power_configuration_server}
-- {from: raz1_custom_components, id: rz_led_blink}
-- {from: raz1_custom_components, id: rz_button_press}
+- {id: zigbee_scan_dispatch}
+- {id: zigbee_scenes}
+- {id: zigbee_stack_diagnostics}
+- {id: zigbee_zcl_framework_core}
+- {id: zigbee_zll}
+- {id: zigbee_zll_on_off_server}
+- {id: zigbee_zll_scenes_server}
 config_file:
 - {path: config/zcl/zcl_config.zap, directory: zcl}
 configuration:
@@ -119,3 +119,4 @@ ui_hints:
   - {path: readme.html}
 sdk_extension:
 - {id: raz1_custom_components, version: 0.0.1}
+

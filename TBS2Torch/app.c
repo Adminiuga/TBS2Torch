@@ -38,7 +38,6 @@
 #define MAX_LEVEL EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL
 #endif // SL_CATALOG_ZIGBEE_ZLL_LEVEL_CONTROL_SERVER_PRESENT
 
-#if (LARGE_NETWORK_TESTING == 0)
 #ifndef EZSP_HOST
 #include "config/zigbee_sleep_config.h"
 #endif // EZSP_HOST
@@ -386,26 +385,6 @@ static void btn1_long_press_handler(void)
 {
   networkHandlersLeaveNetwork();
 }
-
-
-//Internal testing stuff
-#if defined(EMBER_TEST)
-void emberAfHalButtonIsrCallback(uint8_t button, uint8_t state)
-{
-  if (state == BUTTON_RELEASED) {
-    sl_zigbee_event_set_active(&finding_and_binding_event);
-  }
-}
-#endif // EMBER_TEST
-
-#ifdef SL_CATALOG_ZIGBEE_FORCE_SLEEP_AND_WAKEUP_PRESENT
-void sli_zigbee_app_framework_force_sleep_callback(void)
-{
-  // Do other things like turn off LEDs etc
-  sl_led_turn_off(&sl_led_led0);
-}
-#endif // SL_CATALOG_ZIGBEE_FORCE_SLEEP_AND_WAKEUP_PRESENT
-#endif //#if (LARGE_NETWORK_TESTING == 0)
 
 void sl_zigbee_common_rtos_wakeup_stack_task()
 {

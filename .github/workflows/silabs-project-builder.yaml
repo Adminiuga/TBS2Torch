@@ -127,7 +127,7 @@ jobs:
         shell: bash
         run: chown -R builder .
 
-      - name: Install and Trust the SDK Extenstions
+      - name: Install the SDK Extenstions
         if: ${{ inputs.sdk_extensions != '' }}
         shell: bash
         run: |
@@ -135,10 +135,10 @@ jobs:
           cd ${{ env.sdk_path }}/extension
           for EXT in ${{ inputs.sdk_extensions }}
           do
-            if [ "$EXT" == "*#*" ]
+            if [[ "$EXT" == *#* ]]
             then
-              URL="part1="${EXT%%#*}"
-              tag="${EXT#*#}""
+              URL="${EXT%%#*}"
+              TAG="${EXT#*#}"
               echo "Clonining ${URL} with '${TAG}' tag"
               git clone --depth 1 -b "${TAG}" "$URL"
             else

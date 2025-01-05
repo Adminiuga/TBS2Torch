@@ -148,6 +148,10 @@ void hal_rgb_led_set_brightness(uint8_t level)
 
 
   sl_led_set_rgb_color(&sl_simple_rgb_pwm_led_rgb_led0, red, green, blue);
+  if ( SL_LED_CURRENT_STATE_OFF == sl_led_get_state((const sl_led_t *) &sl_simple_rgb_pwm_led_rgb_led0) )
+  {
+    hal_rgb_led_turnoff();
+  }
   targetLevel = MAX(level, 1);
 }
 

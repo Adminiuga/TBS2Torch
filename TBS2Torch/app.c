@@ -42,6 +42,7 @@
 #include "config/zigbee_sleep_config.h"
 #endif // EZSP_HOST
 
+#include "rz_led_blink.h"
 #include "config/ota-client-policy-config.h"
 #include "hw/drivers.h"
 #include "app-global.h"
@@ -71,6 +72,8 @@ static void btn1_long_press_handler();
  */
 void emberAfMainInitCallback(void)
 {
+  rz_led_blink_init();
+  rz_button_init();
   networkHandlersInit();
   handlerRhtInit();
   sl_status_t status = handlerHallInit();
@@ -269,7 +272,7 @@ static void btn0_medium_press_handler(void)
                                       ZCL_ON_OFF_TRANSITION_TIME_ATTRIBUTE_ID,
                                       (uint8_t *) &transitionTime,
                                       sizeof(transitionTime));
-  if (status != EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) {
+  if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) {
       // Get On transition time or off Transition time,
       // if on_off_transition_time is not supported
       uint16_t attributeToGet;
@@ -315,16 +318,20 @@ static void btn0_medium_press_handler(void)
   }
 
   // control fade in/fade out by a fake command data
-  uint8_t cmd_data[3];
+  sl_zcl_level_control_cluster_move_to_level_command_t cmd_data;
   EmberAfClusterCommand cmd;
   cmd.buffer = (uint8_t *) &cmd_data;
-  cmd.bufLen = sizeof(3);
+  cmd.bufLen = sizeof(cmd_data);
   cmd.clusterSpecific = true;
   cmd.commandId = ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID;
   cmd.payloadStartIndex = 0;
 
-  cmd_data[0] = targetLevel;
-  emberAfCopyInt16u(cmd_data + 1, 0, transitionTime);
+  cmd_data.level = targetLevel;
+  emberAfCopyInt16u(&(cmd_data.transitionTime), 0, transitionTime);
+  sl_zigbee_app_debug_println("Move to %d level from button for %s*0.1s, on/off: %d",
+          targetLevel,
+          transitionTime,
+          isStateOn);
 
   emberAfLevelControlClusterMoveToLevelWithOnOffCallback(&cmd);
 }

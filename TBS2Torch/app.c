@@ -100,31 +100,16 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint,
   if (clusterId == ZCL_ON_OFF_CLUSTER_ID
       && attributeId == ZCL_ON_OFF_ATTRIBUTE_ID
       && mask == CLUSTER_MASK_SERVER) {
-    bool onOff;
-    if (emberAfReadServerAttribute(endpoint,
-                                   ZCL_ON_OFF_CLUSTER_ID,
-                                   ZCL_ON_OFF_ATTRIBUTE_ID,
-                                   (uint8_t *)&onOff,
-                                   sizeof(onOff))
-        == EMBER_ZCL_STATUS_SUCCESS) {
-      if (onOff) {
-        hal_rgb_led_turnon();
-      } else {
-        hal_rgb_led_turnoff();
-      }
+    if ( !!value[0] ) {
+      hal_rgb_led_turnon();
+    } else {
+      hal_rgb_led_turnoff();
     }
   } else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID
              && attributeId == ZCL_CURRENT_LEVEL_ATTRIBUTE_ID
              && mask == CLUSTER_MASK_SERVER) {
-    uint8_t level;
-    if (emberAfReadServerAttribute(endpoint,
-                                   clusterId,
-                                   attributeId,
-                                   (uint8_t *) &level,
-                                   sizeof(level))
-        == EMBER_ZCL_STATUS_SUCCESS) {
-        sl_zigbee_app_debug_println("Level from the attr read: %d, level from post attr change: %d", level,  (uint8_t) *value);
-        hal_rgb_led_set_brightness(CLAMP(level, MIN_LEVEL, MAX_LEVEL));
+      sl_zigbee_app_debug_println("Level from the attr read: %d, level from post attr change: %d", level,  (uint8_t) *value);
+      hal_rgb_led_set_brightness(CLAMP(value[0], MIN_LEVEL, MAX_LEVEL));
     }
   }
 }

@@ -43,6 +43,7 @@
 #endif // EZSP_HOST
 
 #include "rz_led_blink.h"
+#include "rz_button.h"
 #include "config/ota-client-policy-config.h"
 #include "hw/drivers.h"
 #include "app-global.h"
@@ -108,9 +109,8 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint,
   } else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID
              && attributeId == ZCL_CURRENT_LEVEL_ATTRIBUTE_ID
              && mask == CLUSTER_MASK_SERVER) {
-      sl_zigbee_app_debug_println("Level from the attr read: %d, level from post attr change: %d", level,  (uint8_t) *value);
+      sl_zigbee_app_debug_println("Level from post attr change: %d", (uint8_t) *value);
       hal_rgb_led_set_brightness(CLAMP(value[0], MIN_LEVEL, MAX_LEVEL));
-    }
   }
 }
 
@@ -312,7 +312,7 @@ static void btn0_medium_press_handler(void)
   cmd.payloadStartIndex = 0;
 
   cmd_data.level = targetLevel;
-  emberAfCopyInt16u(&(cmd_data.transitionTime), 0, transitionTime);
+  emberAfCopyInt16u((uint8_t *) &(cmd_data.transitionTime), 0, transitionTime);
   sl_zigbee_app_debug_println("Move to %d level from button for %s*0.1s, on/off: %d",
           targetLevel,
           transitionTime,

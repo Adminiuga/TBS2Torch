@@ -9,8 +9,8 @@
 #define CONFIG_APP_GLOBAL_H_
 
 #define MAX(a, b) (a > b) ? a : b
-#define MIN(a, b) (a < b) ? a : b
-#define CLAMP(v, min, max) MIN(MAX(v, min), max)
+#define _MIN(a, b) (a < b) ? a : b
+#define CLAMP(v, min, max) _MIN(MAX(v, min), max)
 
 // Fade out transition time in 10th of sec
 #define FADEOUT_TRANSITION_TIME 5*10

@@ -125,14 +125,25 @@ void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
 {
   // At startup, trigger a read of the attribute and possibly a toggle of the
   // LED to make sure they are always in sync.
+  uint8_t onOff;
+  if (emberAfReadServerAttribute(endpoint,
+                                 ZCL_ON_OFF_CLUSTER_ID,
+                                 ZCL_ON_OFF_ATTRIBUTE_ID,
+                                 (uint8_t *) &onOff,
+                                 sizeof(onOff))
+      == EMBER_ZCL_STATUS_SUCCESS) {
+      sl_zigbee_app_debug_println("Current OnOff is %d", onOff);
+  }
+
+  // hardware state sync
   emberAfPostAttributeChangeCallback(endpoint,
                                      ZCL_ON_OFF_CLUSTER_ID,
                                      ZCL_ON_OFF_ATTRIBUTE_ID,
                                      CLUSTER_MASK_SERVER,
                                      0,
-                                     0,
-                                     0,
-                                     NULL);
+                                     ZCL_INT8U_ATTRIBUTE_TYPE,
+                                     sizeof(onOff),
+                                     &onOff);
   handlerRhtUpdate();
 }
 
@@ -401,7 +412,7 @@ void emberAfPluginLevelControlClusterServerPostInitCallback(uint8_t endpoint)
                                      ZCL_CURRENT_LEVEL_ATTRIBUTE_ID,
                                      CLUSTER_MASK_SERVER,
                                      0,
-                                     0,
-                                     0,
-                                     NULL);
+                                     ZCL_INT8U_ATTRIBUTE_TYPE,
+                                     sizeof(level),
+                                     &level);
 };

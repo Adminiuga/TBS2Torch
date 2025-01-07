@@ -102,15 +102,28 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint,
       && attributeId == ZCL_ON_OFF_ATTRIBUTE_ID
       && mask == CLUSTER_MASK_SERVER) {
     if ( !!value[0] ) {
+      // Turn on, but the turn off is handled by the level control cluster
       hal_rgb_led_turnon();
-    } else {
-      hal_rgb_led_turnoff();
     }
   } else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID
-             && attributeId == ZCL_CURRENT_LEVEL_ATTRIBUTE_ID
              && mask == CLUSTER_MASK_SERVER) {
+    if (attributeId == ZCL_CURRENT_LEVEL_ATTRIBUTE_ID) {
       sl_zigbee_app_debug_println("Level from post attr change: %d", (uint8_t) *value);
       hal_rgb_led_set_brightness(CLAMP(value[0], MIN_LEVEL, MAX_LEVEL));
+    } else if ( attributeId == ZCL_LEVEL_CONTROL_REMAINING_TIME_ATTRIBUTE_ID
+                && 0 == value[0] ) {
+        // Must have finished a transition, sync the off state
+        uint8_t onOff = 1;
+        EmberAfStatus status = emberAfReadServerAttribute(endpoint,
+                                                          ZCL_ON_OFF_CLUSTER_ID,
+                                                          ZCL_ON_OFF_ATTRIBUTE_ID,
+                                                          (uint8_t *) &onOff,
+                                                          sizeof(onOff));
+        if ( status != EMBER_ZCL_STATUS_SUCCESS || 0 == onOff ) {
+            sl_zigbee_app_debug_println("Turning off RGB light after level transition");
+            hal_rgb_led_turnoff();
+        }
+    }
   }
 }
 

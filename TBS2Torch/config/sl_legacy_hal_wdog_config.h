@@ -37,7 +37,7 @@
 
 // <e SL_LEGACY_HAL_DISABLE_WATCHDOG> Disable calling halInternalEnableWatchDog in base-replacement.c's halInit().
 // <i> Default: 0
-#define SL_LEGACY_HAL_DISABLE_WATCHDOG 0
+#define SL_LEGACY_HAL_DISABLE_WATCHDOG 1
 // </e>
 
 // <o SL_LEGACY_HAL_WDOGn> WDOG to use for SL_LEGACY_HAL_WDOGn.

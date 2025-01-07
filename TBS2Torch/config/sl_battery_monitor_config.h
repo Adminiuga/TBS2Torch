@@ -221,13 +221,13 @@
 #define SL_BATTERY_MONITOR_ADC_POS_SEL          adcPosSelAPORT3XCH14
 
 // <e SL_BATTERY_MONITOR_R_DIVIDER_ENABLED> Battery Voltage is using R1/R2 resistive divider
-#define SL_BATTERY_MONITOR_R_DIVIDER_ENABLED    1
+#define SL_BATTERY_MONITOR_R_DIVIDER_ENABLED    0
 
 // <o SL_BATTERY_MONITOR_R_DIVIDER_R1> R1 Resistive divider Input Voltage leg
-#define SL_BATTERY_MONITOR_R_DIVIDER_R1         1800
+#define SL_BATTERY_MONITOR_R_DIVIDER_R1         1000
 
 // <o SL_BATTERY_MONITOR_R_DIVIDER_R2> R2 Resistive divider Ground leg
-#define SL_BATTERY_MONITOR_R_DIVIDER_R2         2700
+#define SL_BATTERY_MONITOR_R_DIVIDER_R2         1000
 // </e>
 
 // </h> end Battery Monitor config
@@ -237,6 +237,7 @@
                                             + SL_BATTERY_MONITOR_R_DIVIDER_R2)
 #define SL_BATTERY_MONITOR_R_DIVIDER_COEF  SL_BATTERY_MONITOR_R_DIVIDER_R1_R2 \
                                            / SL_BATTERY_MONITOR_R_DIVIDER_R2
+
 
 // <<< sl:start pin_tool >>>
 // <prs gpio=true > SL_BATTERY_MONITOR_TX_ACTIVE

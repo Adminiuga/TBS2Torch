@@ -38,11 +38,12 @@
 #define MAX_LEVEL EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL
 #endif // SL_CATALOG_ZIGBEE_ZLL_LEVEL_CONTROL_SERVER_PRESENT
 
-#if (LARGE_NETWORK_TESTING == 0)
 #ifndef EZSP_HOST
 #include "config/zigbee_sleep_config.h"
 #endif // EZSP_HOST
 
+#include "rz_led_blink.h"
+#include "rz_button.h"
 #include "config/ota-client-policy-config.h"
 #include "hw/drivers.h"
 #include "app-global.h"
@@ -72,6 +73,8 @@ static void btn1_long_press_handler();
  */
 void emberAfMainInitCallback(void)
 {
+  rz_led_blink_init();
+  rz_button_init();
   networkHandlersInit();
   handlerRhtInit();
   sl_status_t status = handlerHallInit();
@@ -98,32 +101,16 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint,
   if (clusterId == ZCL_ON_OFF_CLUSTER_ID
       && attributeId == ZCL_ON_OFF_ATTRIBUTE_ID
       && mask == CLUSTER_MASK_SERVER) {
-    bool onOff;
-    if (emberAfReadServerAttribute(endpoint,
-                                   ZCL_ON_OFF_CLUSTER_ID,
-                                   ZCL_ON_OFF_ATTRIBUTE_ID,
-                                   (uint8_t *)&onOff,
-                                   sizeof(onOff))
-        == EMBER_ZCL_STATUS_SUCCESS) {
-      if (onOff) {
-        hal_rgb_led_turnon();
-      } else {
-        hal_rgb_led_turnoff();
-      }
+    if ( !!value[0] ) {
+      hal_rgb_led_turnon();
+    } else {
+      hal_rgb_led_turnoff();
     }
   } else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID
              && attributeId == ZCL_CURRENT_LEVEL_ATTRIBUTE_ID
              && mask == CLUSTER_MASK_SERVER) {
-    uint8_t level;
-    if (emberAfReadServerAttribute(endpoint,
-                                   clusterId,
-                                   attributeId,
-                                   (uint8_t *) &level,
-                                   sizeof(level))
-        == EMBER_ZCL_STATUS_SUCCESS) {
-        sl_zigbee_app_debug_println("Level from the attr read: %d, level from post attr change: %d", level,  (uint8_t) *value);
-        hal_rgb_led_set_brightness(CLAMP(level, MIN_LEVEL, MAX_LEVEL));
-    }
+      sl_zigbee_app_debug_println("Level from post attr change: %d", (uint8_t) *value);
+      hal_rgb_led_set_brightness(CLAMP(value[0], MIN_LEVEL, MAX_LEVEL));
   }
 }
 
@@ -138,14 +125,25 @@ void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
 {
   // At startup, trigger a read of the attribute and possibly a toggle of the
   // LED to make sure they are always in sync.
+  uint8_t onOff;
+  if (emberAfReadServerAttribute(endpoint,
+                                 ZCL_ON_OFF_CLUSTER_ID,
+                                 ZCL_ON_OFF_ATTRIBUTE_ID,
+                                 (uint8_t *) &onOff,
+                                 sizeof(onOff))
+      == EMBER_ZCL_STATUS_SUCCESS) {
+      sl_zigbee_app_debug_println("Current OnOff is %d", onOff);
+  }
+
+  // hardware state sync
   emberAfPostAttributeChangeCallback(endpoint,
                                      ZCL_ON_OFF_CLUSTER_ID,
                                      ZCL_ON_OFF_ATTRIBUTE_ID,
                                      CLUSTER_MASK_SERVER,
                                      0,
-                                     0,
-                                     0,
-                                     NULL);
+                                     ZCL_INT8U_ATTRIBUTE_TYPE,
+                                     sizeof(onOff),
+                                     &onOff);
   handlerRhtUpdate();
 }
 
@@ -270,7 +268,7 @@ static void btn0_medium_press_handler(void)
                                       ZCL_ON_OFF_TRANSITION_TIME_ATTRIBUTE_ID,
                                       (uint8_t *) &transitionTime,
                                       sizeof(transitionTime));
-  if (status != EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) {
+  if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) {
       // Get On transition time or off Transition time,
       // if on_off_transition_time is not supported
       uint16_t attributeToGet;
@@ -316,16 +314,20 @@ static void btn0_medium_press_handler(void)
   }
 
   // control fade in/fade out by a fake command data
-  uint8_t cmd_data[3];
+  sl_zcl_level_control_cluster_move_to_level_command_t cmd_data;
   EmberAfClusterCommand cmd;
   cmd.buffer = (uint8_t *) &cmd_data;
-  cmd.bufLen = sizeof(3);
+  cmd.bufLen = sizeof(cmd_data);
   cmd.clusterSpecific = true;
   cmd.commandId = ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID;
   cmd.payloadStartIndex = 0;
 
-  cmd_data[0] = targetLevel;
-  emberAfCopyInt16u(cmd_data + 1, 0, transitionTime);
+  cmd_data.level = targetLevel;
+  emberAfCopyInt16u((uint8_t *) &(cmd_data.transitionTime), 0, transitionTime);
+  sl_zigbee_app_debug_println("Move to %d level from button for %s*0.1s, on/off: %d",
+          targetLevel,
+          transitionTime,
+          isStateOn);
 
   emberAfLevelControlClusterMoveToLevelWithOnOffCallback(&cmd);
 }
@@ -387,26 +389,6 @@ static void btn1_long_press_handler(void)
   networkHandlersLeaveNetwork();
 }
 
-
-//Internal testing stuff
-#if defined(EMBER_TEST)
-void emberAfHalButtonIsrCallback(uint8_t button, uint8_t state)
-{
-  if (state == BUTTON_RELEASED) {
-    sl_zigbee_event_set_active(&finding_and_binding_event);
-  }
-}
-#endif // EMBER_TEST
-
-#ifdef SL_CATALOG_ZIGBEE_FORCE_SLEEP_AND_WAKEUP_PRESENT
-void sli_zigbee_app_framework_force_sleep_callback(void)
-{
-  // Do other things like turn off LEDs etc
-  sl_led_turn_off(&sl_led_led0);
-}
-#endif // SL_CATALOG_ZIGBEE_FORCE_SLEEP_AND_WAKEUP_PRESENT
-#endif //#if (LARGE_NETWORK_TESTING == 0)
-
 void sl_zigbee_common_rtos_wakeup_stack_task()
 {
 };
@@ -430,7 +412,7 @@ void emberAfPluginLevelControlClusterServerPostInitCallback(uint8_t endpoint)
                                      ZCL_CURRENT_LEVEL_ATTRIBUTE_ID,
                                      CLUSTER_MASK_SERVER,
                                      0,
-                                     0,
-                                     0,
-                                     NULL);
+                                     ZCL_INT8U_ATTRIBUTE_TYPE,
+                                     sizeof(level),
+                                     &level);
 };

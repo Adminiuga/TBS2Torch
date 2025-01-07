@@ -327,7 +327,8 @@ static void btn0_medium_press_handler(void)
   }
 
   // control fade in/fade out by a fake command data
-  sl_zcl_level_control_cluster_move_to_level_command_t cmd_data;
+  uint8_t cmd_data[5];
+  MEMSET(cmd_data, 0, sizeof(cmd_data));
   EmberAfClusterCommand cmd;
   cmd.buffer = (uint8_t *) &cmd_data;
   cmd.bufLen = sizeof(cmd_data);
@@ -335,8 +336,8 @@ static void btn0_medium_press_handler(void)
   cmd.commandId = ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID;
   cmd.payloadStartIndex = 0;
 
-  cmd_data.level = targetLevel;
-  emberAfCopyInt16u((uint8_t *) &(cmd_data.transitionTime), 0, transitionTime);
+  cmd_data[0] = targetLevel;
+  emberAfCopyInt16u((uint8_t *) &(cmd_data[1]), 0, transitionTime);
   sl_zigbee_app_debug_println("Move to %d level from button for %s*0.1s, on/off: %d",
           targetLevel,
           transitionTime,

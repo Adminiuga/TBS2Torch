@@ -98,6 +98,14 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint,
                                         uint8_t size,
                                         uint8_t* value)
 {
+  sl_zigbee_app_debug_print("%d Post attr change: ep: %d, cluster: 0x%04x, attr: 0x%04x, size: %d ",
+                            TIMESTAMP_MS, endpoint, clusterId, attributeId, size);
+  if ( size == 2 ) {
+    sl_zigbee_app_debug_println("value: 0x%02x%02x", value[1], value[0]);
+  } else {
+    sl_zigbee_app_debug_println("value: 0x%02x", value[0]);
+  }
+
   if (clusterId == ZCL_ON_OFF_CLUSTER_ID
       && attributeId == ZCL_ON_OFF_ATTRIBUTE_ID
       && mask == CLUSTER_MASK_SERVER) {

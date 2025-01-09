@@ -1,8 +1,9 @@
-From a487607eb9be56d4bac94eadf3c40050ca15064f Mon Sep 17 00:00:00 2001
+From 10e80a3f21211124e436079945f809b71d2a79a8 Mon Sep 17 00:00:00 2001
 From: Alexei Chetroi <Alexei.Chetroi@outlook.com>
 Date: Wed, 8 Jan 2025 17:31:51 -0500
 Subject: [PATCH] Minimum changes to the level-control component
 
+Handle transition time on and transition time off attributes.
 ---
  .../zigbee/app/framework/plugin/level-control/level-control.c   | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

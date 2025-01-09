@@ -968,14 +968,20 @@ void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint,
 #endif
 
   // Read the OnOffTransitionTime attribute.
-#ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME_ATTRIBUTE
+#if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME_ATTRIBUTE) || defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_LEVEL_ATTRIBUTE)
+  // If either of these attributes are used, we need to read the OnOffTransitionTime.
+  uint16_t attrId = (newValue
+                     ? ZCL_ON_TRANSITION_TIME_ATTRIBUTE_ID
+                     : ZCL_OFF_TRANSITION_TIME_ATTRIBUTE_ID);
   status = emberAfReadServerAttribute(endpoint,
                                       ZCL_LEVEL_CONTROL_CLUSTER_ID,
-                                      ZCL_ON_OFF_TRANSITION_TIME_ATTRIBUTE_ID,
+                                      attrId,
                                       (uint8_t *)&currentOnOffTransitionTime,
                                       sizeof(currentOnOffTransitionTime));
   if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
+    emberAfLevelControlClusterPrintln("ERR: Couldn't read %d attribute of the LevelControl cluster %x",
+                                      attrId,
+                                      status);
     return;
   }
 #else

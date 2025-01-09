@@ -19,6 +19,7 @@ void hal_rgb_led_enable(int ledNumber);
 void hal_rgb_led_disable(int ledNumber);
 void hal_rgb_led_turnon();
 void hal_rgb_led_turnoff();
+void hal_rgb_led_turnonoff(bool turn_on);
 void hal_rgb_led_set_rgbcolor(uint16_t red, uint16_t green, uint16_t blue);
 void hal_rgb_led_set_brightness(uint8_t brightness);
 uint8_t hal_rgb_led_get_brightness();

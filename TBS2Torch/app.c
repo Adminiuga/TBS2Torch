@@ -421,23 +421,16 @@ void sl_zigbee_common_rtos_wakeup_stack_task()
 
 void emberAfPluginLevelControlClusterServerPostInitCallback(uint8_t endpoint)
 {
-  uint8_t level;
-  if (emberAfReadServerAttribute(endpoint,
-                                 ZCL_LEVEL_CONTROL_CLUSTER_ID,
-                                 ZCL_CURRENT_LEVEL_ATTRIBUTE_ID,
-                                 (uint8_t *) &level,
-                                 sizeof(level))
-      == EMBER_ZCL_STATUS_SUCCESS) {
-      sl_zigbee_app_debug_println("Current level is %d", level);
-  }
+  uint16_t remainingTime = 0;
+  sl_zigbee_app_debug_println("%d Level Control cluster initialized.", TIMESTAMP_MS);
 
   // hardware state sync
   emberAfPostAttributeChangeCallback(endpoint,
                                      ZCL_LEVEL_CONTROL_CLUSTER_ID,
-                                     ZCL_CURRENT_LEVEL_ATTRIBUTE_ID,
+                                     ZCL_LEVEL_CONTROL_REMAINING_TIME_ATTRIBUTE_ID,
                                      CLUSTER_MASK_SERVER,
                                      0,
-                                     ZCL_INT8U_ATTRIBUTE_TYPE,
-                                     sizeof(level),
-                                     &level);
+                                     ZCL_INT16U_ATTRIBUTE_TYPE,
+                                     sizeof(remainingTime),
+                                     (uint8_t *) &remainingTime);
 };

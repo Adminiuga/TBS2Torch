@@ -289,34 +289,8 @@ static void btn0_medium_press_handler(void)
   }
 
   // Get transition time on/off attribute
-  uint16_t transitionTime;
-  status = emberAfReadServerAttribute(emberAfPrimaryEndpoint(),
-                                      ZCL_LEVEL_CONTROL_CLUSTER_ID,
-                                      ZCL_ON_OFF_TRANSITION_TIME_ATTRIBUTE_ID,
-                                      (uint8_t *) &transitionTime,
-                                      sizeof(transitionTime));
-  if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) {
-      // Get On transition time or off Transition time,
-      // if on_off_transition_time is not supported
-      uint16_t attributeToGet;
-
-      if (isStateOn) {
-          attributeToGet = ZCL_ON_TRANSITION_TIME_ATTRIBUTE_ID;
-      } else {
-          attributeToGet = ZCL_OFF_TRANSITION_TIME_ATTRIBUTE_ID;
-      }
-      status = emberAfReadServerAttribute(emberAfPrimaryEndpoint(),
-                                          ZCL_LEVEL_CONTROL_CLUSTER_ID,
-                                          attributeToGet,
-                                          (uint8_t *) &transitionTime,
-                                          sizeof(transitionTime));
-      if (status != EMBER_ZCL_STATUS_SUCCESS
-          || transitionTime == 0x0000) {
-          transitionTime = (isStateOn) ? FADEIN_TRANSITION_TIME : FADEOUT_TRANSITION_TIME;
-      }
-  }
-
-  uint8_t targetLevel;
+  uint16_t transitionTime = 50;
+  uint8_t targetLevel = MIN_LEVEL;
   if (isStateOn) {
       // we'll be transitioning to off state smoothly, as defined in app config
       targetLevel = MIN_LEVEL;
@@ -341,23 +315,11 @@ static void btn0_medium_press_handler(void)
   }
 
   // control fade in/fade out by a fake command data
-  uint8_t cmd_data[5];
-  MEMSET(cmd_data, 0, sizeof(cmd_data));
-  EmberAfClusterCommand cmd;
-  cmd.buffer = (uint8_t *) &cmd_data;
-  cmd.bufLen = sizeof(cmd_data);
-  cmd.clusterSpecific = true;
-  cmd.commandId = ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID;
-  cmd.payloadStartIndex = 0;
-
-  cmd_data[0] = targetLevel;
-  emberAfCopyInt16u((uint8_t *) &(cmd_data[1]), 0, transitionTime);
-  sl_zigbee_app_debug_println("Move to %d level from button for %s*0.1s, on/off: %d",
-          targetLevel,
-          transitionTime,
-          isStateOn);
-
-  emberAfLevelControlClusterMoveToLevelWithOnOffCallback(&cmd);
+  emberAfSetCommandEndpoints(emberAfPrimaryEndpoint(), emberAfPrimaryEndpoint());
+  emberAfFillCommandLevelControlClusterMoveToLevelWithOnOff(
+    targetLevel, transitionTime);
+  status = emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, emberAfGetNodeId());
+  sl_zigbee_app_debug_println("Move to level %d cmd sent, status: 0x%02x", targetLevel, status);
 }
 
 /** @brief Button long duration press callback

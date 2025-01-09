@@ -229,6 +229,7 @@ void emberAfLevelControlClusterServerTickCallback(uint8_t endpoint)
 
   // Are we at the requested level?
   if (currentLevel == state->moveToLevel) {
+    writeRemainingTime(endpoint, 0);
     if (state->commandId == ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID
         || state->commandId == ZCL_MOVE_WITH_ON_OFF_COMMAND_ID
         || state->commandId == ZCL_STEP_WITH_ON_OFF_COMMAND_ID) {
@@ -262,7 +263,6 @@ void emberAfLevelControlClusterServerTickCallback(uint8_t endpoint)
         }
       }
     }
-    writeRemainingTime(endpoint, 0);
   } else {
     writeRemainingTime(endpoint,
                        state->transitionTimeMs - state->elapsedTimeMs);
@@ -637,6 +637,11 @@ static void moveToLevelHandler(uint8_t commandId,
       goto send_default_response;
     }
 
+    if ( 0xFFFF == transitionTimeDs ) {
+      // if the on_off_transition_time attribute is still 0xffff,
+      // then move as fast as possible
+      transitionTimeDs = 0;
+    }
     // Transition time comes in (or is stored, in the case of On/Off Transition
     // Time) as tenths of a second, but we work in milliseconds.
     state->transitionTimeMs = (transitionTimeDs
@@ -982,31 +987,32 @@ void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint,
   resolvedLevel = temporaryCurrentLevelCache;
 #endif
 
-  // Read the OnOffTransitionTime attribute.
-#ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME_ATTRIBUTE
+  // Read the OnTransitionTime or OffTransitionTime attribute.
+#if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_TRANSITION_TIME_ATTRIBUTE) && defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_OFF_TRANSITION_TIME_ATTRIBUTE)
+  uint16_t attrId = (newValue
+                     ? ZCL_ON_TRANSITION_TIME_ATTRIBUTE_ID
+                     : ZCL_OFF_TRANSITION_TIME_ATTRIBUTE_ID);
   status = emberAfReadServerAttribute(endpoint,
                                       ZCL_LEVEL_CONTROL_CLUSTER_ID,
-                                      ZCL_ON_OFF_TRANSITION_TIME_ATTRIBUTE_ID,
+                                      attrId,
                                       (uint8_t *)&currentOnOffTransitionTime,
                                       sizeof(currentOnOffTransitionTime));
   if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
-    return;
+    emberAfLevelControlClusterPrintln("ERR: reading on_transition_time or off_transition_time: %x", status);
+    currentOnOffTransitionTime = 0xFFFF;
   }
 #else
+  // the transition time will be determined by the OnOffTransitionTime attribute
   currentOnOffTransitionTime = 0xFFFF;
 #endif
 
   if (newValue) {
     // If newValue is ZCL_ON_COMMAND_ID...
-    // "Set CurrentLevel to minimum level allowed for the device",
-    // unless we just make it instantaneous, depending on OnOff transition time
-    bool instanteneous = currentOnOffTransitionTime == 0x000
-                         || currentOnOffTransitionTime == 0xFFFF;
+    // "Set CurrentLevel to minimum level allowed for the device."
     status = emberAfWriteServerAttribute(endpoint,
                                          ZCL_LEVEL_CONTROL_CLUSTER_ID,
                                          ZCL_CURRENT_LEVEL_ATTRIBUTE_ID,
-                                         (uint8_t *) (instanteneous) ? &resolvedLevel : &minimumLevelAllowedForTheDevice,
+                                         &minimumLevelAllowedForTheDevice,
                                          ZCL_INT8U_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS) {
       emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);

@@ -232,7 +232,10 @@ void rz_button_short_press_cb(uint8_t button)
  */
 static void btn0_short_press_handler()
 {
-  emberAfOnOffClusterSetValueCallback(emberAfPrimaryEndpoint(), ZCL_TOGGLE_COMMAND_ID, false);
+  emberAfSetCommandEndpoints(emberAfPrimaryEndpoint(), emberAfPrimaryEndpoint());
+  emberAfFillCommandOnOffClusterToggle();
+  EmberStatus status = emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, emberAfGetNodeId());
+  sl_zigbee_app_debug_println("Toggle command sent, status: 0x%02x", status);
 }
 
 static void btn1_short_press_handler()

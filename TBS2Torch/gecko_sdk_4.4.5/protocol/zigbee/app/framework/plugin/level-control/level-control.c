@@ -550,14 +550,7 @@ static void moveToLevelHandler(uint8_t commandId,
                                uint8_t optionOverride,
                                uint16_t storedLevel)
 {
-  bool sendResponse = true;
-  uint8_t endpoint;
-  if (emberAfCurrentCommand() == NULL) {
-      endpoint = emberAfPrimaryEndpoint();
-      sendResponse = false;
-  } else {
-      endpoint = emberAfCurrentEndpoint();
-  }
+  uint8_t endpoint = emberAfCurrentEndpoint();
   EmberAfLevelControlState *state = getState(endpoint);
   EmberAfStatus status;
   uint8_t currentLevel;
@@ -637,11 +630,6 @@ static void moveToLevelHandler(uint8_t commandId,
       goto send_default_response;
     }
 
-    if ( 0xFFFF == transitionTimeDs ) {
-      // if the on_off_transition_time attribute is still 0xffff,
-      // then move as fast as possible
-      transitionTimeDs = 0;
-    }
     // Transition time comes in (or is stored, in the case of On/Off Transition
     // Time) as tenths of a second, but we work in milliseconds.
     state->transitionTimeMs = (transitionTimeDs
@@ -682,8 +670,7 @@ static void moveToLevelHandler(uint8_t commandId,
 #endif
 
   send_default_response:
-  if (sendResponse
-      && emberAfCurrentCommand()->apsFrame->clusterId
+  if (emberAfCurrentCommand()->apsFrame->clusterId
       == ZCL_LEVEL_CONTROL_CLUSTER_ID) {
     emberAfSendImmediateDefaultResponse(status);
   }
@@ -691,14 +678,7 @@ static void moveToLevelHandler(uint8_t commandId,
 
 static void moveHandler(uint8_t commandId, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
 {
-  bool sendResponse = true;
-  uint8_t endpoint;
-  if (emberAfCurrentCommand() == NULL) {
-      endpoint = emberAfPrimaryEndpoint();
-      sendResponse = false;
-  } else {
-      endpoint = emberAfCurrentEndpoint();
-  }
+  uint8_t endpoint = emberAfCurrentEndpoint();
   EmberAfLevelControlState *state = getState(endpoint);
   EmberAfStatus status;
   uint8_t currentLevel;
@@ -801,7 +781,7 @@ static void moveHandler(uint8_t commandId, uint8_t moveMode, uint8_t rate, uint8
   status = EMBER_ZCL_STATUS_SUCCESS;
 
   send_default_response:
-  if (sendResponse) emberAfSendImmediateDefaultResponse(status);
+  emberAfSendImmediateDefaultResponse(status);
 }
 
 static void stepHandler(uint8_t commandId,
@@ -987,22 +967,18 @@ void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint,
   resolvedLevel = temporaryCurrentLevelCache;
 #endif
 
-  // Read the OnTransitionTime or OffTransitionTime attribute.
-#if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_TRANSITION_TIME_ATTRIBUTE) && defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_OFF_TRANSITION_TIME_ATTRIBUTE)
-  uint16_t attrId = (newValue
-                     ? ZCL_ON_TRANSITION_TIME_ATTRIBUTE_ID
-                     : ZCL_OFF_TRANSITION_TIME_ATTRIBUTE_ID);
+  // Read the OnOffTransitionTime attribute.
+#ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME_ATTRIBUTE
   status = emberAfReadServerAttribute(endpoint,
                                       ZCL_LEVEL_CONTROL_CLUSTER_ID,
-                                      attrId,
+                                      ZCL_ON_OFF_TRANSITION_TIME_ATTRIBUTE_ID,
                                       (uint8_t *)&currentOnOffTransitionTime,
                                       sizeof(currentOnOffTransitionTime));
   if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfLevelControlClusterPrintln("ERR: reading on_transition_time or off_transition_time: %x", status);
-    currentOnOffTransitionTime = 0xFFFF;
+    emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
+    return;
   }
 #else
-  // the transition time will be determined by the OnOffTransitionTime attribute
   currentOnOffTransitionTime = 0xFFFF;
 #endif
 
@@ -1012,7 +988,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint,
     status = emberAfWriteServerAttribute(endpoint,
                                          ZCL_LEVEL_CONTROL_CLUSTER_ID,
                                          ZCL_CURRENT_LEVEL_ATTRIBUTE_ID,
-                                         &minimumLevelAllowedForTheDevice,
+                                         (uint8_t *)&minimumLevelAllowedForTheDevice,
                                          ZCL_INT8U_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS) {
       emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);

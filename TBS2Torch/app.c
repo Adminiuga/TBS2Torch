@@ -98,19 +98,38 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint,
                                         uint8_t size,
                                         uint8_t* value)
 {
-  if (clusterId == ZCL_ON_OFF_CLUSTER_ID
-      && attributeId == ZCL_ON_OFF_ATTRIBUTE_ID
-      && mask == CLUSTER_MASK_SERVER) {
-    if ( !!value[0] ) {
-      hal_rgb_led_turnon();
-    } else {
-      hal_rgb_led_turnoff();
-    }
-  } else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID
-             && attributeId == ZCL_CURRENT_LEVEL_ATTRIBUTE_ID
-             && mask == CLUSTER_MASK_SERVER) {
-      sl_zigbee_app_debug_println("Level from post attr change: %d", (uint8_t) *value);
+  //sl_zigbee_app_debug_print("%d Post attr change: ep: %d, cluster: 0x%04x, attr: 0x%04x, size: %d ",
+  //                          TIMESTAMP_MS, endpoint, clusterId, attributeId, size);
+  //if ( size == 2 ) {
+  //  sl_zigbee_app_debug_println("value: 0x%02x%02x", value[1], value[0]);
+  //} else {
+  //  sl_zigbee_app_debug_println("value: 0x%02x", value[0]);
+  //}
+
+  if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID
+       && mask == CLUSTER_MASK_SERVER) {
+    if (attributeId == ZCL_CURRENT_LEVEL_ATTRIBUTE_ID) {
       hal_rgb_led_set_brightness(CLAMP(value[0], MIN_LEVEL, MAX_LEVEL));
+    } else if ( attributeId == ZCL_LEVEL_CONTROL_REMAINING_TIME_ATTRIBUTE_ID ) {
+        // get the supposed on/off state
+        uint8_t onOff;
+        EmberAfStatus status = emberAfReadServerAttribute(endpoint,
+                                                          ZCL_ON_OFF_CLUSTER_ID,
+                                                          ZCL_ON_OFF_ATTRIBUTE_ID,
+                                                          (uint8_t *) &onOff,
+                                                          sizeof(onOff));
+        if ( status != EMBER_ZCL_STATUS_SUCCESS ) {
+            sl_zigbee_app_debug_println("Couldn't read current 'on/off' state: %s, forcing light off");
+            hal_rgb_led_turnoff();
+            return;
+        }
+        // update on/off state, since we obviously either transitioning or finished
+        // transitioning
+        assert( 2 == size );
+        if ( onOff || ( (value[0] == 0) && (value[1] == 0) ) ) {
+          hal_rgb_led_turnonoff(onOff);
+        }
+    }
   }
 }
 
@@ -123,27 +142,6 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint,
  */
 void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
 {
-  // At startup, trigger a read of the attribute and possibly a toggle of the
-  // LED to make sure they are always in sync.
-  uint8_t onOff;
-  if (emberAfReadServerAttribute(endpoint,
-                                 ZCL_ON_OFF_CLUSTER_ID,
-                                 ZCL_ON_OFF_ATTRIBUTE_ID,
-                                 (uint8_t *) &onOff,
-                                 sizeof(onOff))
-      == EMBER_ZCL_STATUS_SUCCESS) {
-      sl_zigbee_app_debug_println("Current OnOff is %d", onOff);
-  }
-
-  // hardware state sync
-  emberAfPostAttributeChangeCallback(endpoint,
-                                     ZCL_ON_OFF_CLUSTER_ID,
-                                     ZCL_ON_OFF_ATTRIBUTE_ID,
-                                     CLUSTER_MASK_SERVER,
-                                     0,
-                                     ZCL_INT8U_ATTRIBUTE_TYPE,
-                                     sizeof(onOff),
-                                     &onOff);
   handlerRhtUpdate();
 }
 
@@ -170,9 +168,7 @@ void handlerShakerShakingStop(uint32_t durationMs) {
   if ( (700 < durationMs) && (durationMs < 1600) ) {
       sl_zigbee_app_debug_println("Toggling light on short shake of %dms",
                                   durationMs);
-      emberAfOnOffClusterSetValueCallback(emberAfPrimaryEndpoint(),
-                                          ZCL_TOGGLE_COMMAND_ID,
-                                          false);
+      btn0_short_press_handler();
   }
 }
 
@@ -208,7 +204,10 @@ void rz_button_short_press_cb(uint8_t button)
  */
 static void btn0_short_press_handler()
 {
-  emberAfOnOffClusterSetValueCallback(emberAfPrimaryEndpoint(), ZCL_TOGGLE_COMMAND_ID, false);
+  emberAfSetCommandEndpoints(emberAfPrimaryEndpoint(), emberAfPrimaryEndpoint());
+  emberAfFillCommandOnOffClusterToggle();
+  EmberStatus status = emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, emberAfGetNodeId());
+  sl_zigbee_app_debug_println("Toggle command sent, status: 0x%02x", status);
 }
 
 static void btn1_short_press_handler()
@@ -262,38 +261,9 @@ static void btn0_medium_press_handler(void)
   }
 
   // Get transition time on/off attribute
-  uint16_t transitionTime;
-  status = emberAfReadServerAttribute(emberAfPrimaryEndpoint(),
-                                      ZCL_LEVEL_CONTROL_CLUSTER_ID,
-                                      ZCL_ON_OFF_TRANSITION_TIME_ATTRIBUTE_ID,
-                                      (uint8_t *) &transitionTime,
-                                      sizeof(transitionTime));
-  if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) {
-      // Get On transition time or off Transition time,
-      // if on_off_transition_time is not supported
-      uint16_t attributeToGet;
-
-      if (isStateOn) {
-          attributeToGet = ZCL_ON_TRANSITION_TIME_ATTRIBUTE_ID;
-      } else {
-          attributeToGet = ZCL_OFF_TRANSITION_TIME_ATTRIBUTE_ID;
-      }
-      status = emberAfReadServerAttribute(emberAfPrimaryEndpoint(),
-                                          ZCL_LEVEL_CONTROL_CLUSTER_ID,
-                                          attributeToGet,
-                                          (uint8_t *) &transitionTime,
-                                          sizeof(transitionTime));
-      if (status != EMBER_ZCL_STATUS_SUCCESS
-          || transitionTime == 0x0000) {
-          transitionTime = (isStateOn) ? FADEIN_TRANSITION_TIME : FADEOUT_TRANSITION_TIME;
-      }
-  }
-
-  uint8_t targetLevel;
-  if (isStateOn) {
-      // we'll be transitioning to off state smoothly, as defined in app config
-      targetLevel = MIN_LEVEL;
-  } else {
+  uint16_t transitionTime = 50;
+  uint8_t targetLevel = MIN_LEVEL;
+  if ( !isStateOn) {
       // we'll be transitioning to on level smoothly, as defined in app config2
       status = emberAfReadServerAttribute(emberAfPrimaryEndpoint(),
                                           ZCL_LEVEL_CONTROL_CLUSTER_ID,
@@ -311,25 +281,21 @@ static void btn0_medium_press_handler(void)
       if (status != EMBER_ZCL_STATUS_SUCCESS || targetLevel == 0x00) {
           targetLevel = MAX_LEVEL;
       }
+      // we're off, so put the minimum level to start the fadein
+      uint8_t resetLevel = MIN_LEVEL;
+      emberAfWriteServerAttribute(emberAfPrimaryEndpoint(),
+                                  ZCL_LEVEL_CONTROL_CLUSTER_ID,
+                                  ZCL_CURRENT_LEVEL_ATTRIBUTE_ID,
+                                  (uint8_t *) &resetLevel,
+                                  ZCL_INT8U_ATTRIBUTE_TYPE);
   }
 
   // control fade in/fade out by a fake command data
-  sl_zcl_level_control_cluster_move_to_level_command_t cmd_data;
-  EmberAfClusterCommand cmd;
-  cmd.buffer = (uint8_t *) &cmd_data;
-  cmd.bufLen = sizeof(cmd_data);
-  cmd.clusterSpecific = true;
-  cmd.commandId = ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID;
-  cmd.payloadStartIndex = 0;
-
-  cmd_data.level = targetLevel;
-  emberAfCopyInt16u((uint8_t *) &(cmd_data.transitionTime), 0, transitionTime);
-  sl_zigbee_app_debug_println("Move to %d level from button for %s*0.1s, on/off: %d",
-          targetLevel,
-          transitionTime,
-          isStateOn);
-
-  emberAfLevelControlClusterMoveToLevelWithOnOffCallback(&cmd);
+  emberAfSetCommandEndpoints(emberAfPrimaryEndpoint(), emberAfPrimaryEndpoint());
+  emberAfFillCommandLevelControlClusterMoveToLevelWithOnOff(
+    targetLevel, transitionTime);
+  status = emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, emberAfGetNodeId());
+  sl_zigbee_app_debug_println("Move to level %d cmd sent, status: 0x%02x", targetLevel, status);
 }
 
 /** @brief Button long duration press callback
@@ -396,23 +362,16 @@ void sl_zigbee_common_rtos_wakeup_stack_task()
 
 void emberAfPluginLevelControlClusterServerPostInitCallback(uint8_t endpoint)
 {
-  uint8_t level;
-  if (emberAfReadServerAttribute(endpoint,
-                                 ZCL_LEVEL_CONTROL_CLUSTER_ID,
-                                 ZCL_CURRENT_LEVEL_ATTRIBUTE_ID,
-                                 (uint8_t *) &level,
-                                 sizeof(level))
-      == EMBER_ZCL_STATUS_SUCCESS) {
-      sl_zigbee_app_debug_println("Current level is %d", level);
-  }
+  uint16_t remainingTime = 0;
+  sl_zigbee_app_debug_println("%d Level Control cluster initialized.", TIMESTAMP_MS);
 
   // hardware state sync
   emberAfPostAttributeChangeCallback(endpoint,
                                      ZCL_LEVEL_CONTROL_CLUSTER_ID,
-                                     ZCL_CURRENT_LEVEL_ATTRIBUTE_ID,
+                                     ZCL_LEVEL_CONTROL_REMAINING_TIME_ATTRIBUTE_ID,
                                      CLUSTER_MASK_SERVER,
                                      0,
-                                     ZCL_INT8U_ATTRIBUTE_TYPE,
-                                     sizeof(level),
-                                     &level);
+                                     ZCL_INT16U_ATTRIBUTE_TYPE,
+                                     sizeof(remainingTime),
+                                     (uint8_t *) &remainingTime);
 };

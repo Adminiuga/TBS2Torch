@@ -1,0 +1,33 @@
+From 10e80a3f21211124e436079945f809b71d2a79a8 Mon Sep 17 00:00:00 2001
+From: Alexei Chetroi <Alexei.Chetroi@outlook.com>
+Date: Wed, 8 Jan 2025 17:31:51 -0500
+Subject: [PATCH] Minimum changes to the level-control component
+
+Handle transition time on and transition time off attributes.
+---
+ .../zigbee/app/framework/plugin/level-control/level-control.c   | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/protocol/zigbee/app/framework/plugin/level-control/level-control.c b/protocol/zigbee/app/framework/plugin/level-control/level-control.c
+index 9cef92991..2bc509b05 100644
+--- a/protocol/zigbee/app/framework/plugin/level-control/level-control.c
++++ b/protocol/zigbee/app/framework/plugin/level-control/level-control.c
+@@ -229,6 +229,7 @@ void emberAfLevelControlClusterServerTickCallback(uint8_t endpoint)
+ 
+   // Are we at the requested level?
+   if (currentLevel == state->moveToLevel) {
++    writeRemainingTime(endpoint, 0);
+     if (state->commandId == ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID
+         || state->commandId == ZCL_MOVE_WITH_ON_OFF_COMMAND_ID
+         || state->commandId == ZCL_STEP_WITH_ON_OFF_COMMAND_ID) {
+@@ -262,7 +263,6 @@ void emberAfLevelControlClusterServerTickCallback(uint8_t endpoint)
+         }
+       }
+     }
+-    writeRemainingTime(endpoint, 0);
+   } else {
+     writeRemainingTime(endpoint,
+                        state->transitionTimeMs - state->elapsedTimeMs);
+-- 
+2.47.1.windows.1
+

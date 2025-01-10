@@ -123,17 +123,11 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint,
             hal_rgb_led_turnoff();
             return;
         }
-        // update on/off state, since we obviously either transitioning or still
+        // update on/off state, since we obviously either transitioning or finished
         // transitioning
         assert( 2 == size );
-        // sync state, unless is off but still transitioning
-        //sl_zigbee_app_debug_print("Remaining time: %d, onOff is '%s':", *((uint16_t *) value), onOff ? "ON" : "OFF");
         if ( onOff || ( (value[0] == 0) && (value[1] == 0) ) ) {
-          //sl_zigbee_app_debug_print(" Syncing light state");
           hal_rgb_led_turnonoff(onOff);
-        }
-        if ( value[0] == 0 && value[1] == 0) {
-          sl_zigbee_app_debug_println("finished the transition, the on/off is %d, led state: %d");
         }
     }
   }
@@ -269,10 +263,7 @@ static void btn0_medium_press_handler(void)
   // Get transition time on/off attribute
   uint16_t transitionTime = 50;
   uint8_t targetLevel = MIN_LEVEL;
-  if (isStateOn) {
-      // we'll be transitioning to off state smoothly, as defined in app config
-      targetLevel = MIN_LEVEL;
-  } else {
+  if ( !isStateOn) {
       // we'll be transitioning to on level smoothly, as defined in app config2
       status = emberAfReadServerAttribute(emberAfPrimaryEndpoint(),
                                           ZCL_LEVEL_CONTROL_CLUSTER_ID,
@@ -290,6 +281,13 @@ static void btn0_medium_press_handler(void)
       if (status != EMBER_ZCL_STATUS_SUCCESS || targetLevel == 0x00) {
           targetLevel = MAX_LEVEL;
       }
+      // we're off, so put the minimum level to start the fadein
+      uint8_t resetLevel = MIN_LEVEL;
+      emberAfWriteServerAttribute(emberAfPrimaryEndpoint(),
+                                  ZCL_LEVEL_CONTROL_CLUSTER_ID,
+                                  ZCL_CURRENT_LEVEL_ATTRIBUTE_ID,
+                                  (uint8_t *) &resetLevel,
+                                  ZCL_INT8U_ATTRIBUTE_TYPE);
   }
 
   // control fade in/fade out by a fake command data

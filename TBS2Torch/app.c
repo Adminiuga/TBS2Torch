@@ -98,18 +98,17 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint,
                                         uint8_t size,
                                         uint8_t* value)
 {
-  sl_zigbee_app_debug_print("%d Post attr change: ep: %d, cluster: 0x%04x, attr: 0x%04x, size: %d ",
-                            TIMESTAMP_MS, endpoint, clusterId, attributeId, size);
-  if ( size == 2 ) {
-    sl_zigbee_app_debug_println("value: 0x%02x%02x", value[1], value[0]);
-  } else {
-    sl_zigbee_app_debug_println("value: 0x%02x", value[0]);
-  }
+  //sl_zigbee_app_debug_print("%d Post attr change: ep: %d, cluster: 0x%04x, attr: 0x%04x, size: %d ",
+  //                          TIMESTAMP_MS, endpoint, clusterId, attributeId, size);
+  //if ( size == 2 ) {
+  //  sl_zigbee_app_debug_println("value: 0x%02x%02x", value[1], value[0]);
+  //} else {
+  //  sl_zigbee_app_debug_println("value: 0x%02x", value[0]);
+  //}
 
   if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID
        && mask == CLUSTER_MASK_SERVER) {
     if (attributeId == ZCL_CURRENT_LEVEL_ATTRIBUTE_ID) {
-      sl_zigbee_app_debug_println("Level from post attr change: %d", (uint8_t) *value);
       hal_rgb_led_set_brightness(CLAMP(value[0], MIN_LEVEL, MAX_LEVEL));
     } else if ( attributeId == ZCL_LEVEL_CONTROL_REMAINING_TIME_ATTRIBUTE_ID ) {
         // get the supposed on/off state
@@ -128,12 +127,14 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint,
         // transitioning
         assert( 2 == size );
         // sync state, unless is off but still transitioning
-        sl_zigbee_app_debug_print("Remaining time: %d, onOff is '%s':", *((uint16_t *) value), onOff ? "ON" : "OFF");
-        if ( onOff || ! ( (uint16_t *) *value) ) {
-          sl_zigbee_app_debug_print(" Syncing light state");
+        //sl_zigbee_app_debug_print("Remaining time: %d, onOff is '%s':", *((uint16_t *) value), onOff ? "ON" : "OFF");
+        if ( onOff || ( (value[0] == 0) && (value[1] == 0) ) ) {
+          //sl_zigbee_app_debug_print(" Syncing light state");
           hal_rgb_led_turnonoff(onOff);
         }
-        sl_zigbee_core_debug_println("");
+        if ( value[0] == 0 && value[1] == 0) {
+          sl_zigbee_app_debug_println("finished the transition, the on/off is %d, led state: %d");
+        }
     }
   }
 }
@@ -147,27 +148,6 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint,
  */
 void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
 {
-  // At startup, trigger a read of the attribute and possibly a toggle of the
-  // LED to make sure they are always in sync.
-  uint8_t onOff;
-  if (emberAfReadServerAttribute(endpoint,
-                                 ZCL_ON_OFF_CLUSTER_ID,
-                                 ZCL_ON_OFF_ATTRIBUTE_ID,
-                                 (uint8_t *) &onOff,
-                                 sizeof(onOff))
-      == EMBER_ZCL_STATUS_SUCCESS) {
-      sl_zigbee_app_debug_println("Current OnOff is %d", onOff);
-  }
-
-  // hardware state sync
-  emberAfPostAttributeChangeCallback(endpoint,
-                                     ZCL_ON_OFF_CLUSTER_ID,
-                                     ZCL_ON_OFF_ATTRIBUTE_ID,
-                                     CLUSTER_MASK_SERVER,
-                                     0,
-                                     ZCL_INT8U_ATTRIBUTE_TYPE,
-                                     sizeof(onOff),
-                                     &onOff);
   handlerRhtUpdate();
 }
 
@@ -194,9 +174,7 @@ void handlerShakerShakingStop(uint32_t durationMs) {
   if ( (700 < durationMs) && (durationMs < 1600) ) {
       sl_zigbee_app_debug_println("Toggling light on short shake of %dms",
                                   durationMs);
-      emberAfOnOffClusterSetValueCallback(emberAfPrimaryEndpoint(),
-                                          ZCL_TOGGLE_COMMAND_ID,
-                                          false);
+      btn0_short_press_handler();
   }
 }
 

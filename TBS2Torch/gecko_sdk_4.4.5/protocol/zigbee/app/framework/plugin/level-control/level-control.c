@@ -967,8 +967,8 @@ void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint,
   resolvedLevel = temporaryCurrentLevelCache;
 #endif
 
-  // Read the OnOffTransitionTime attribute.
-#if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME_ATTRIBUTE) || defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_LEVEL_ATTRIBUTE)
+// Read the OnTransitionTime or offTransitionTime attribute.
+#if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_TRANSITION_TIME_ATTRIBUTE) || defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_OFF_TRANSITION_TIME_ATTRIBUTE)
   // If either of these attributes are used, we need to read the OnOffTransitionTime.
   uint16_t attrId = (newValue
                      ? ZCL_ON_TRANSITION_TIME_ATTRIBUTE_ID

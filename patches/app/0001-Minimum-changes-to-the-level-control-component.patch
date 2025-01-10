@@ -1,15 +1,15 @@
-From 10e80a3f21211124e436079945f809b71d2a79a8 Mon Sep 17 00:00:00 2001
+From f43a9d3c2b1fd46733d167cbdfeb28604eb8d66d Mon Sep 17 00:00:00 2001
 From: Alexei Chetroi <Alexei.Chetroi@outlook.com>
 Date: Wed, 8 Jan 2025 17:31:51 -0500
 Subject: [PATCH] Minimum changes to the level-control component
 
 Handle transition time on and transition time off attributes.
 ---
- .../zigbee/app/framework/plugin/level-control/level-control.c   | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../plugin/level-control/level-control.c         | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/protocol/zigbee/app/framework/plugin/level-control/level-control.c b/protocol/zigbee/app/framework/plugin/level-control/level-control.c
-index 9cef92991..2bc509b05 100644
+index 9cef92991..e0199e3ad 100644
 --- a/protocol/zigbee/app/framework/plugin/level-control/level-control.c
 +++ b/protocol/zigbee/app/framework/plugin/level-control/level-control.c
 @@ -229,6 +229,7 @@ void emberAfLevelControlClusterServerTickCallback(uint8_t endpoint)
@@ -28,6 +28,32 @@ index 9cef92991..2bc509b05 100644
    } else {
      writeRemainingTime(endpoint,
                         state->transitionTimeMs - state->elapsedTimeMs);
+@@ -967,15 +967,21 @@ void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint,
+   resolvedLevel = temporaryCurrentLevelCache;
+ #endif
+ 
+-  // Read the OnOffTransitionTime attribute.
+-#ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME_ATTRIBUTE
++// Read the OnTransitionTime or offTransitionTime attribute.
++#if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_TRANSITION_TIME_ATTRIBUTE) || defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_OFF_TRANSITION_TIME_ATTRIBUTE)
++  // If either of these attributes are used, we need to read the OnOffTransitionTime.
++  uint16_t attrId = (newValue
++                     ? ZCL_ON_TRANSITION_TIME_ATTRIBUTE_ID
++                     : ZCL_OFF_TRANSITION_TIME_ATTRIBUTE_ID);
+   status = emberAfReadServerAttribute(endpoint,
+                                       ZCL_LEVEL_CONTROL_CLUSTER_ID,
+-                                      ZCL_ON_OFF_TRANSITION_TIME_ATTRIBUTE_ID,
++                                      attrId,
+                                       (uint8_t *)&currentOnOffTransitionTime,
+                                       sizeof(currentOnOffTransitionTime));
+   if (status != EMBER_ZCL_STATUS_SUCCESS) {
+-    emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
++    emberAfLevelControlClusterPrintln("ERR: Couldn't read %d attribute of the LevelControl cluster %x",
++                                      attrId,
++                                      status);
+     return;
+   }
+ #else
 -- 
 2.47.1.windows.1
 

@@ -82,7 +82,7 @@ jobs:
               )
         }}
 
-      export_project_name: "app_btl"
+      export_project_name: "TBS2Torch_btl"
       device: ${{ inputs.device }}
       components: >
         ${{ inputs.board != '' && format('{0},', inputs.board) || '' }}

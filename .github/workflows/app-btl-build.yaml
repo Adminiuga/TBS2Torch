@@ -178,6 +178,7 @@ jobs:
         name: Upload bootloader & bootloader OTA image artifact
         with:
           name: ${{ env.btl_project_name }}
+          overwrite: true
           path: |
             ${{ env.btl_project_name }}/version.json
             ${{ env.btl_project_name }}/*.gbl

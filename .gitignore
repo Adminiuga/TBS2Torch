@@ -13,10 +13,18 @@ vscode.conf
 */.projectlinkstore
 */*.Makefile
 */GNU ARM */
+*/build/
+*/*_cmake/
+*/config/*.h
+!*/config/app-global.h
 */.uceditor
 */autogen/*
 */.trash/
 */*.project.mak
+TBS2Torch/gecko_sdk_4.*
+!TBS2Torch/gecko_sdk_4.*/protocol/zigbee/app/framework/plugin/level-control/level-control.c
+TBS2Torch/raz1_custom_components_*/*
+
 
 */.pdm
 *.pdf

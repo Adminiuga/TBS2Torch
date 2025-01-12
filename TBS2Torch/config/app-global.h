@@ -8,9 +8,12 @@
 #ifndef CONFIG_APP_GLOBAL_H_
 #define CONFIG_APP_GLOBAL_H_
 
+#include "sl_sleeptimer.h"
+#define TIMESTAMP_MS (sl_sleeptimer_tick_to_ms(sl_sleeptimer_get_tick_count()))
+
 #define MAX(a, b) (a > b) ? a : b
-#define MIN(a, b) (a < b) ? a : b
-#define CLAMP(v, min, max) MIN(MAX(v, min), max)
+#define _MIN(a, b) (a < b) ? a : b
+#define CLAMP(v, min, max) _MIN(MAX(v, min), max)
 
 // Fade out transition time in 10th of sec
 #define FADEOUT_TRANSITION_TIME 5*10

@@ -37,73 +37,95 @@ source:
 - {path: handlers/rht.c}
 - {path: handlers/shaker.h}
 - {path: handlers/shaker.c}
-- {path: gecko_sdk_4.4.0/protocol/zigbee/app/framework/plugin/level-control/level-control.c}
+- {path: gecko_sdk_4.4.5/protocol/zigbee/app/framework/plugin/level-control/level-control.c}
 tag: [prebuilt_demo]
-sdk: {id: gecko_sdk, version: 4.4.0}
+sdk: {id: gecko_sdk, version: 4.4.5}
 toolchain_settings: []
 component:
-- {id: zigbee_ota_storage_simple_eeprom}
-- {id: zigbee_ota_client}
-- {id: slot_manager}
-- instance: [btn0, btn1]
-  id: simple_button
-- {id: power_manager_deepsleep}
+- {from: raz1_custom_components, id: power_configuration_server}
+- {from: raz1_custom_components, id: rz_button_press}
+- {from: raz1_custom_components, id: rz_led_blink}
+- {id: EFR32MG12P332F1024GL125}
+- {id: app_button_press}
+- {id: brd4166a}
+- {id: brd4166a_support}
 - instance: [example]
   id: cli
-- {id: brd4166a}
-- {id: zigbee_ota_client_policy}
-- {id: zigbee_pro_leaf_stack}
-- {id: zigbee_end_device_support}
-- {id: zigbee_application_bootloader}
-- {id: zigbee_color_control_server}
-- {id: EFR32MG12P332F1024GL125}
+- {id: imu_driver}
 - {id: iostream_recommended_stream}
-- {id: zigbee_scenes}
-- {id: zigbee_gp}
+- {id: power_manager_deepsleep}
+- {id: sensor_hall}
+- {id: sensor_rht}
+- {id: si70xx_driver}
+- {id: si7210_driver}
+- instance: [btn0, btn1]
+  id: simple_button
 - instance: [led0]
   id: simple_led
-- {id: zigbee_zcl_framework_core}
-- {id: zigbee_stack_diagnostics}
-- {id: zigbee_network_steering}
-- {id: zigbee_find_and_bind_target}
-- {id: zigbee_zll_scenes_server}
-- {id: brd4166a_support}
-- {id: zigbee_level_control}
-- {id: zigbee_counters}
-- {id: zigbee_identify}
-- {id: zigbee_green_power_common}
 - instance: [rgb_led0]
   id: simple_rgb_pwm_led
+- {id: slot_manager}
+- {id: zigbee_application_bootloader}
 - {id: zigbee_basic}
-- {id: zigbee_ota_storage_simple}
-- {id: app_button_press}
-- {id: zigbee_zll_on_off_server}
-- {id: zigbee_ota_bootload}
-- {id: zigbee_green_power_client}
-- {id: zigbee_scan_dispatch}
-- {id: zigbee_groups_server}
-- {id: zigbee_zll}
-- {id: zigbee_on_off}
-- {id: zigbee_r22_support}
+- {id: zigbee_color_control_server}
+- {id: zigbee_counters}
 - {id: zigbee_debug_print}
+- {id: zigbee_end_device_support}
+- {id: zigbee_find_and_bind_target}
+- {id: zigbee_gp}
+- {id: zigbee_green_power_client}
+- {id: zigbee_green_power_common}
+- {id: zigbee_groups_server}
+- {id: zigbee_identify}
+- {id: zigbee_level_control}
+- {id: zigbee_network_steering}
+- {id: zigbee_on_off}
+- {id: zigbee_ota_bootload}
+- {id: zigbee_ota_client}
+- {id: zigbee_ota_client_policy}
+- {id: zigbee_ota_storage_simple}
+- {id: zigbee_ota_storage_simple_eeprom}
+- {id: zigbee_pro_leaf_stack}
+- {id: zigbee_r22_support}
 - {id: zigbee_reporting}
-- {id: si7210_driver}
-- {id: sensor_hall}
-- {id: si70xx_driver}
-- {id: sensor_rht}
-- {id: imu_driver}
-- {from: raz1_custom_components, id: power_configuration_server}
-- {from: raz1_custom_components, id: rz_led_blink}
-- {from: raz1_custom_components, id: rz_button_press}
+- {id: zigbee_scan_dispatch}
+- {id: zigbee_scenes}
+- {id: zigbee_stack_diagnostics}
+- {id: zigbee_zcl_framework_core}
+- {id: zigbee_zll}
+- {id: zigbee_zll_on_off_server}
+- {id: zigbee_zll_scenes_server}
 config_file:
 - {path: config/zcl/zcl_config.zap, directory: zcl}
 configuration:
 - {name: SL_BOARD_ENABLE_VCOM, value: '1'}
 - {name: SL_IOSTREAM_USART_VCOM_FLOW_CONTROL_TYPE, value: usartHwFlowControlNone}
+- {name: SL_IOSTREAM_USART_VCOM_RESTRICT_ENERGY_MODE_TO_ALLOW_RECEPTION, value: 0}
 - {name: SL_CLI_MAX_INPUT_ARGUMENTS, value: '16'}
 - {name: SLI_ZIGBEE_PRIMARY_NETWORK_DEVICE_TYPE, value: SLI_ZIGBEE_NETWORK_DEVICE_TYPE_END_DEVICE}
 - {name: SLI_ZIGBEE_PRIMARY_NETWORK_SECURITY_TYPE, value: SLI_ZIGBEE_NETWORK_SECURITY_TYPE_3_0}
 - {name: SL_CLI_PROMPT_STRING, value: '"TBS2Torch>"'}
+- {name: EMBER_BINDING_TABLE_SIZE, value: 32}
+- name: EMBER_AF_REJOIN_ATTEMPTS_MAX
+  value: 32
+  condition: [zigbee_end_device_support]
+- name: SL_ZIGBEE_APP_FRAMEWORK_STAY_AWAKE_WHEN_NOT_JOINED
+  value: 0
+- name: EMBER_END_DEVICE_POLL_TIMEOUT
+  value: MINUTES_64
+  condition: [zigbee_pro_leaf_stack]
+- name: EMBER_AF_PLUGIN_OTA_CLIENT_IGNORE_NON_TRUST_CENTER
+  value: 1
+  condition: [zigbee_ota_client]
+- name: EMBER_AF_PLUGIN_OTA_CLIENT_QUERY_DELAY_MINUTES
+  value: 60
+  condition: [zigbee_ota_client]
+- name: EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_IMAGE_TYPE_ID
+  value: 2285
+  condition: [zigbee_ota_client]
+- name: EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_FIRMWARE_VERSION
+  value: 230805000
+  condition: [zigbee_ota_client]
 - condition: [device_series_1]
   name: NVM3_DEFAULT_NVM_SIZE
   value: '36864'
@@ -113,9 +135,46 @@ configuration:
 - {name: SL_PSA_ITS_SUPPORT_V1_DRIVER, value: '0'}
 - {name: SL_PSA_ITS_SUPPORT_V2_DRIVER, value: '0'}
 - {name: SL_PSA_ITS_SUPPORT_V3_DRIVER, value: '1'}
+- name: MEDIUM_BUTTON_PRESS_DURATION
+  value: 1000
+  condition: [app_button_press]
+- name: SL_BOARD_ENABLE_SENSOR_HALL
+  value: 1
+  condition: [brd4166a]
+- name: SL_BOARD_ENABLE_SENSOR_IMU
+  value: 1
+  condition: [brd4166a]
+- name: SL_BOARD_ENABLE_SENSOR_RHT
+  value: 1
+  condition: [brd4166a]
+- name: EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE
+  value: 16
+  condition: [zigbee_reporting]
+- name: EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_GECKO_BOOTLOADER_STORAGE_SUPPORT
+  value: USE_FIRST_SLOT
+  condition: [slot_manager]
+- name: EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_STORAGE_END
+  value: 262144
+  condition: [slot_manager]
+- name: SL_POWER_CONFIGURATION_BATTERY_TYPE
+  value: SL_POWER_CONFIGURATION_BATTERY_TYPE_18650
+  condition: [power_configuration_server]
+- name: RZ_BUTTON_PRESS_TIMEOUT_MS
+  value: 700
+  condition: [rz_button_press]
+- name: SL_BATTERY_MONITOR_R_DIVIDER_ENABLED
+  value: 1
+  condition: [power_configuration_server]
+- name: SL_BATTERY_MONITOR_R_DIVIDER_R1
+  value: 1800
+  condition: [power_configuration_server]
+- name: SL_BATTERY_MONITOR_R_DIVIDER_R2
+  value: 2700
+  condition: [power_configuration_server]
 ui_hints:
   highlight:
   - {path: '', focus: true}
   - {path: readme.html}
 sdk_extension:
-- {id: raz1_custom_components, version: 0.0.1}
+- {id: raz1_custom_components, version: 0.0.2}
+

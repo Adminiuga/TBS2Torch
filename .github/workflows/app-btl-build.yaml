@@ -58,7 +58,7 @@ jobs:
       metadata_extra: "{}"
       ota_string: ${{ inputs.app_ota_string }}
       sdk_extensions: |
-        "https://github.com/Adminiuga/Raz1_custom_components_extension#0.0.1"
+        "https://github.com/Adminiuga/Raz1_custom_components_extension"
 
 
   bootloader-build:
@@ -82,7 +82,7 @@ jobs:
               )
         }}
 
-      export_project_name: "app_btl"
+      export_project_name: "TBS2Torch_btl"
       device: ${{ inputs.device }}
       components: >
         ${{ inputs.board != '' && format('{0},', inputs.board) || '' }}
@@ -127,13 +127,13 @@ jobs:
       btl_project_name: ${{ needs.bootloader-build.outputs.project_name }}
 
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         name: Download App firmware
         with:
           name: ${{ env.app_artifact_name }}
           path: ${{ env.app_artifact_name }}
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         name: Download bootloader build
         with:
           name: ${{ env.btl_artifact_name }}
@@ -182,10 +182,11 @@ jobs:
             --tag-id 0x0000 \
             --tag-file "${{ env.app_project_name }}-btl.gbl"
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         name: Upload bootloader & bootloader OTA image artifact
         with:
           name: ${{ env.btl_project_name }}
+          overwrite: true
           path: |
             ${{ env.btl_project_name }}/version.json
             ${{ env.btl_project_name }}/*.gbl

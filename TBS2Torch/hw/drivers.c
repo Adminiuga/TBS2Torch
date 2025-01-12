@@ -93,14 +93,23 @@ void hal_rgb_led_disable(int ledNumber)
   }
 }
 
+void hal_rgb_led_turnonoff(bool turnon)
+{
+  if ( turnon ) {
+    hal_rgb_leds_enable();
+    sl_simple_rgb_pwm_led_turn_on(sl_simple_rgb_pwm_led_rgb_led0.led_common.context);
+  } else {
+    sl_simple_rgb_pwm_led_turn_off(sl_simple_rgb_pwm_led_rgb_led0.led_common.context);
+    hal_rgb_leds_disable();
+  }
+}
 
 /*
  * Turn LEDs on
  */
 void hal_rgb_led_turnon()
 {
-  hal_rgb_leds_enable();
-  sl_simple_rgb_pwm_led_turn_on(sl_simple_rgb_pwm_led_rgb_led0.led_common.context);
+  hal_rgb_led_turnonoff( true );
 }
 
 
@@ -109,9 +118,7 @@ void hal_rgb_led_turnon()
  */
 void hal_rgb_led_turnoff()
 {
-//  sl_led_turn_off((sl_led_t*)&sl_simple_rgb_pwm_led_rgb_led0);
-  sl_simple_rgb_pwm_led_turn_off(sl_simple_rgb_pwm_led_rgb_led0.led_common.context);
-  hal_rgb_leds_disable();
+  hal_rgb_led_turnonoff( false );
 }
 
 
@@ -130,22 +137,14 @@ void hal_rgb_led_set_rgbcolor(uint16_t red, uint16_t green, uint16_t blue)
 void hal_rgb_led_set_brightness(uint8_t level)
 {
   uint16_t red, green, blue;
-  sl_zigbee_app_debug_print("Setting brightness from %d to %d", targetLevel, level);
   sl_led_get_rgb_color(&sl_simple_rgb_pwm_led_rgb_led0, &red, &green, &blue);
   red = MAX(red, 1);
   green = MAX(green, 1);
   blue = MAX(blue, 1);
 
-  sl_zigbee_app_debug_print(" changing RED from %d ", red);
   red = red * level / targetLevel;
-  sl_zigbee_app_debug_print("to %d ", red);
-  sl_zigbee_app_debug_print(" changing GREEN from %d ", green);
   green = green * level / targetLevel;
-  sl_zigbee_app_debug_print("to %d ", green);
-  sl_zigbee_app_debug_print(" changing BLUE from %d ", blue);
   blue = blue * level / targetLevel;
-  sl_zigbee_app_debug_print("to %d ", blue);
-
 
   sl_led_set_rgb_color(&sl_simple_rgb_pwm_led_rgb_led0, red, green, blue);
   if ( SL_LED_CURRENT_STATE_OFF == sl_led_get_state((const sl_led_t *) &sl_simple_rgb_pwm_led_rgb_led0) )

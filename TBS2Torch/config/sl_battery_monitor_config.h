@@ -28,7 +28,7 @@
 // <1..1000:1>
 // <i> Default: 30
 // <i> The length of time between battery reads.
-#define SL_BATTERY_MONITOR_TIMEOUT_MINUTES 60
+#define SL_BATTERY_MONITOR_TIMEOUT_MINUTES 30
 
 // <o SL_BATTERY_MONITOR_SAMPLE_FIFO_SIZE> Sample Collection FIFO Size
 // <1..20:1>
@@ -218,16 +218,16 @@
 // <adcPosSelOPA3=> OPA3
 // <adcPosSelDEFAULT=> DEFAULT
 // <adcPosSelVSS=> VSS
-#define SL_BATTERY_MONITOR_ADC_POS_SEL          adcPosSelAPORT3XCH14
+#define SL_BATTERY_MONITOR_ADC_POS_SEL          adcPosSelAVDD
 
 // <e SL_BATTERY_MONITOR_R_DIVIDER_ENABLED> Battery Voltage is using R1/R2 resistive divider
-#define SL_BATTERY_MONITOR_R_DIVIDER_ENABLED    0
+#define SL_BATTERY_MONITOR_R_DIVIDER_ENABLED    1
 
 // <o SL_BATTERY_MONITOR_R_DIVIDER_R1> R1 Resistive divider Input Voltage leg
-#define SL_BATTERY_MONITOR_R_DIVIDER_R1         1000
+#define SL_BATTERY_MONITOR_R_DIVIDER_R1         1800
 
 // <o SL_BATTERY_MONITOR_R_DIVIDER_R2> R2 Resistive divider Ground leg
-#define SL_BATTERY_MONITOR_R_DIVIDER_R2         1000
+#define SL_BATTERY_MONITOR_R_DIVIDER_R2         2700
 // </e>
 
 // </h> end Battery Monitor config
@@ -242,20 +242,10 @@
 // <<< sl:start pin_tool >>>
 // <prs gpio=true > SL_BATTERY_MONITOR_TX_ACTIVE
 // $[PRS_SL_BATTERY_MONITOR_TX_ACTIVE]
-#ifndef SL_BATTERY_MONITOR_TX_ACTIVE_CHANNEL    
-#define SL_BATTERY_MONITOR_TX_ACTIVE_CHANNEL     0
-#endif
-
-// PRS CH0 on PC6
-#ifndef SL_BATTERY_MONITOR_TX_ACTIVE_PORT       
-#define SL_BATTERY_MONITOR_TX_ACTIVE_PORT        gpioPortC
-#endif
-#ifndef SL_BATTERY_MONITOR_TX_ACTIVE_PIN        
-#define SL_BATTERY_MONITOR_TX_ACTIVE_PIN         6
-#endif
-#ifndef SL_BATTERY_MONITOR_TX_ACTIVE_LOC        
-#define SL_BATTERY_MONITOR_TX_ACTIVE_LOC         8
-#endif
+#define SL_BATTERY_MONITOR_TX_ACTIVE_CHANNEL    0
+#define SL_BATTERY_MONITOR_TX_ACTIVE_PORT       gpioPortA
+#define SL_BATTERY_MONITOR_TX_ACTIVE_PIN        0
+#define SL_BATTERY_MONITOR_TX_ACTIVE_LOC        0
 // [PRS_SL_BATTERY_MONITOR_TX_ACTIVE]$
 // <<< sl:end pin_tool >>>
 

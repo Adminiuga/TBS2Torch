@@ -85,9 +85,9 @@ env:
   IS_NEW_PROJECT: ${{ inputs.export_project_name != '' && 'yes' || 'no' }}
   IS_BTL: ${{ startsWith(inputs.project_name, 'bootloader') && 'yes' || '' }}
   branch_to_ota: >-
-    ${{ github.ref_name == 'main' 
+    ${{ ( github.ref_name == 'main' || startsWith(github.ref, 'refs/tags/v') )
         && '0'
-        || (startsWith(github.ref_name, 'rc')
+        || ( (startsWith(github.ref_name, 'rc') || (startsWith(github.ref, 'refs/tags/v') && contains(github.ref, 'rc')))
             && '5'
             || ( github.ref_name == 'dev'
                  && '9'

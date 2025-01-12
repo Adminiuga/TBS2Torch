@@ -91,4 +91,4 @@ jobs:
       board: ${{ matrix.board }}
       build_btl:  ${{ github.event.inputs.build_btl != '' && inputs.build_btl || startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/rc') || false }}
       image_name: ${{ needs.build-container.outputs.image_name }}
-      btl_version: ${{ vars.btl_version != '' && vars.btl_version || '6' }}
+      btl_version: ${{ vars.btl_version != '' && vars.btl_version || '5' }}

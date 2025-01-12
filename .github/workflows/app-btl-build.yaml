@@ -70,7 +70,7 @@ jobs:
       project_name: >-
         ${{ vars.btl_project_name != ''
             && vars.btl_project_name
-            || 'bootloader-storage-internal-single-lzma'
+            || 'bootloader-storage-spiflash-single'
         }}
       src_project_path: >-
         ${{
@@ -86,11 +86,19 @@ jobs:
       device: ${{ inputs.device }}
       components: >
         ${{ inputs.board != '' && format('{0},', inputs.board) || '' }}
-        bootloader_compression_lzma,
-        mx25_flash_shutdown_usart
+        bootloader_compression_lzma
       configuration:  |
+        BOOTLOADER_WRITE_DISABLE:1,
         BOOTLOADER_VERSION_MAIN_CUSTOMER:${{ inputs.btl_version }},
+        BTL_STORAGE_SPIFLASH_MACRONIX_MX25R8035F:1,
+        BTL_STORAGE_SPIFLASH_MACRONIX_MX25R3235F:1,
+        SLOT_OVERLAP_ENABLE:0,
         SLOT0_ENABLE:1,
+        SLOT0_START:8192,
+        SLOT0_SIZE:393216,
+        SLOT1_ENABLE:1,
+        SLOT1_START:401408,
+        SLOT1_SIZE:393216,
       extra_c_defs: ""
       sdk_version: ${{ inputs.sdk_version }}
       sdkpatchpath: ''

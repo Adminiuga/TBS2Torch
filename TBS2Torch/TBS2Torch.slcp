@@ -29,7 +29,7 @@ source:
 - {path: handlers/network.c}
 - {path: handlers/color_cbs.h}
 - {path: handlers/color_cbs.c}
-- {path: app-global.h}
+- {path: config/app-global.h}
 - {path: handlers/hall.h}
 - {path: handlers/hall.c}
 - {path: handlers/hall-conn-manager.c}

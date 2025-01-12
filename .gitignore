@@ -16,6 +16,7 @@ vscode.conf
 */build/
 */*_cmake/
 */config/*.h
+!*/config/app-global.h
 */.uceditor
 */autogen/*
 */.trash/

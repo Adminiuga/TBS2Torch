@@ -119,13 +119,13 @@ jobs:
       btl_project_name: ${{ needs.bootloader-build.outputs.project_name }}
 
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         name: Download App firmware
         with:
           name: ${{ env.app_artifact_name }}
           path: ${{ env.app_artifact_name }}
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         name: Download bootloader build
         with:
           name: ${{ env.btl_artifact_name }}
@@ -174,7 +174,7 @@ jobs:
             --tag-id 0x0000 \
             --tag-file "${{ env.app_project_name }}-btl.gbl"
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         name: Upload bootloader & bootloader OTA image artifact
         with:
           name: ${{ env.btl_project_name }}

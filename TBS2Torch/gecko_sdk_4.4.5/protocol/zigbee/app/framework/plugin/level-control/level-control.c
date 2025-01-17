@@ -47,6 +47,8 @@
 #endif
 #endif
 
+#include "app-global.h"
+
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL_ATTRIBUTE
 static bool areStartUpLevelControlServerAttributesTokenized(uint8_t endpoint);
 #endif
@@ -72,13 +74,16 @@ typedef struct {
   uint32_t eventDurationMs;
   uint32_t transitionTimeMs;
   uint32_t elapsedTimeMs;
+  uint32_t eventScheduledTimeMs;
+  uint32_t eventStartTimeMs;
 } EmberAfLevelControlState;
 
 static EmberAfLevelControlState stateTable[EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 static EmberAfLevelControlState *getState(uint8_t endpoint);
 
-static void moveToLevelHandler(uint8_t commandId,
+static void moveToLevelHandler(uint8_t endpoint,
+                               uint8_t commandId,
                                uint8_t level,
                                uint16_t transitionTimeDs,
                                uint8_t optionMask,
@@ -167,6 +172,8 @@ void emberAfLevelControlClusterServerTickCallback(uint8_t endpoint)
     return;
   }
 
+  if ( state->eventStartTimeMs == 0 ) state->eventStartTimeMs = TIMESTAMP_MS;
+
   state->elapsedTimeMs += state->eventDurationMs;
 
 #if !defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_OPTIONS_ATTRIBUTE) \
@@ -189,7 +196,7 @@ void emberAfLevelControlClusterServerTickCallback(uint8_t endpoint)
     return;
   }
 
-  emberAfLevelControlClusterPrint("Event: move from %d", currentLevel);
+  //emberAfLevelControlClusterPrint("Event: move from %d", currentLevel);
 
   // adjust by the proper amount, either up or down
   if (state->transitionTimeMs == 0) {
@@ -205,9 +212,9 @@ void emberAfLevelControlClusterServerTickCallback(uint8_t endpoint)
     currentLevel--;
   }
 
-  emberAfLevelControlClusterPrint(" to %d ", currentLevel);
-  emberAfLevelControlClusterPrintln("(diff %c1)",
-                                    state->increasing ? '+' : '-');
+  //emberAfLevelControlClusterPrint(" to %d ", currentLevel);
+  //emberAfLevelControlClusterPrintln("(diff %c1)",
+  //                                  state->increasing ? '+' : '-');
 
   status = emberAfWriteServerAttribute(endpoint,
                                        ZCL_LEVEL_CONTROL_CLUSTER_ID,
@@ -229,6 +236,9 @@ void emberAfLevelControlClusterServerTickCallback(uint8_t endpoint)
 
   // Are we at the requested level?
   if (currentLevel == state->moveToLevel) {
+    uint32_t delta = TIMESTAMP_MS - state->eventStartTimeMs;
+    emberAfLevelControlClusterPrintln("Event: move completed in %d ms, 1st event schedule lag: %d, scheduled transition time: %d",
+        delta, state->eventScheduledTimeMs - state->eventStartTimeMs, state->transitionTimeMs);
     writeRemainingTime(endpoint, 0);
     if (state->commandId == ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID
         || state->commandId == ZCL_MOVE_WITH_ON_OFF_COMMAND_ID
@@ -263,6 +273,9 @@ void emberAfLevelControlClusterServerTickCallback(uint8_t endpoint)
         }
       }
     }
+    delta = TIMESTAMP_MS - state->eventStartTimeMs;
+    emberAfLevelControlClusterPrintln("Event: move completed in %d ms, 1st event schedule lag: %d, scheduled transition time: %d",
+        delta, state->eventScheduledTimeMs - state->eventStartTimeMs, state->transitionTimeMs);
   } else {
     writeRemainingTime(endpoint,
                        state->transitionTimeMs - state->elapsedTimeMs);
@@ -416,7 +429,8 @@ bool emberAfLevelControlClusterMoveToLevelCallback(EmberAfClusterCommand *cmd)
                                     cmd_data.transitionTime,
                                     cmd_data.optionMask,
                                     cmd_data.optionOverride);
-  moveToLevelHandler(ZCL_MOVE_TO_LEVEL_COMMAND_ID,
+  moveToLevelHandler(emberAfCurrentEndpoint(),
+                     ZCL_MOVE_TO_LEVEL_COMMAND_ID,
                      cmd_data.level,
                      cmd_data.transitionTime,
                      cmd_data.optionMask,
@@ -438,7 +452,8 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(EmberAfClusterComman
                                     "RX level-control:",
                                     cmd_data.level,
                                     cmd_data.transitionTime);
-  moveToLevelHandler(ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID,
+  moveToLevelHandler(emberAfCurrentEndpoint(),
+                     ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID,
                      cmd_data.level,
                      cmd_data.transitionTime,
                      0xFF,
@@ -543,14 +558,14 @@ bool emberAfLevelControlClusterStopWithOnOffCallback(void)
   return true;
 }
 
-static void moveToLevelHandler(uint8_t commandId,
+static void moveToLevelHandler(uint8_t endpoint,
+                               uint8_t commandId,
                                uint8_t level,
                                uint16_t transitionTimeDs,
                                uint8_t optionMask,
                                uint8_t optionOverride,
                                uint16_t storedLevel)
 {
-  uint8_t endpoint = emberAfCurrentEndpoint();
   EmberAfLevelControlState *state = getState(endpoint);
   EmberAfStatus status;
   uint8_t currentLevel;
@@ -565,6 +580,9 @@ static void moveToLevelHandler(uint8_t commandId,
     status = EMBER_ZCL_STATUS_SUCCESS;
     goto send_default_response;
   }
+
+  state->eventStartTimeMs = 0;
+  state->eventScheduledTimeMs = TIMESTAMP_MS;
 
   // Cancel any currently active command before fiddling with the state.
   deactivate(endpoint);
@@ -661,6 +679,10 @@ static void moveToLevelHandler(uint8_t commandId,
 
   // The setup was successful, so mark the new state as active and return.
   schedule(endpoint, state->eventDurationMs);
+  emberAfLevelControlClusterPrintln("Lvl Ctl: Move to %d over %d ds, event duration %d ms",
+                                    state->moveToLevel,
+                                    transitionTimeDs,
+                                    state->eventDurationMs);
   status = EMBER_ZCL_STATUS_SUCCESS;
 
 #ifdef SL_CATALOG_ZIGBEE_ZLL_LEVEL_CONTROL_SERVER_PRESENT
@@ -1003,7 +1025,8 @@ void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint,
 
     // "Move CurrentLevel to OnLevel, or to the stored level if OnLevel is not
     // defined, over the time period OnOffTransitionTime."
-    moveToLevelHandler(ZCL_MOVE_TO_LEVEL_COMMAND_ID,
+    moveToLevelHandler(endpoint,
+                       ZCL_MOVE_TO_LEVEL_COMMAND_ID,
                        resolvedLevel,
                        currentOnOffTransitionTime,
                        0xFF,
@@ -1013,7 +1036,8 @@ void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint,
     // ...else if newValue is ZCL_OFF_COMMAND_ID...
     // "Move CurrentLevel to the minimum level allowed for the device over the
     // time period OnOffTransitionTime."
-    moveToLevelHandler(ZCL_MOVE_TO_LEVEL_COMMAND_ID,
+    moveToLevelHandler(endpoint,
+                       ZCL_MOVE_TO_LEVEL_COMMAND_ID,
                        minimumLevelAllowedForTheDevice,
                        currentOnOffTransitionTime,
                        0xFF,

@@ -15,9 +15,8 @@ on:
   push:
     paths:
       - Dockerfile
-      - .github/workflows/build.yaml
+      - .github/workflows/main.yaml
       - .github/workflows/app-btl-build.yaml
-      - .github/workflows/silabs-project-builder.yaml
       - 'TBS2Torch/**'
       - 'patches/**'
     branches:
@@ -26,6 +25,9 @@ on:
       - 'rc-*'
     tags:
       - '*'
+
+  pull_request:
+    types: [opened, reopened, synchronize]
 
 
 jobs:

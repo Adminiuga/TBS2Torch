@@ -1,0 +1,61 @@
+# The entire pipeline was shamelessy borrowed from https://github.com/NabuCasa/silabs-firmware-builder
+# Kudos to NabuCasa and Stefan
+
+name: Project Build Trigger
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_btl:
+        description: "Build Bootloader"
+        required: false
+        default: false
+        type: boolean
+
+  push:
+    paths:
+      - Dockerfile
+      - .github/workflows/main.yaml
+      - .github/workflows/app-btl-build.yaml
+      - 'TBS2Torch/**'
+      - 'patches/**'
+    branches:
+      - main
+      - dev
+      - 'rc-*'
+    tags:
+      - '*'
+
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+
+jobs:
+  build-container:
+    name: Create build container image
+    permissions:
+      packages: write
+      contents: write
+    uses: zha-ng/workflows-silabs/.github/workflows/build-gsdk-container.yaml@v1
+    with:
+      sdk_version: "4.4.5"
+      gcc_version: 12.3.rel1
+      zap_version: v2024.12.13
+
+
+  app-btl-build:
+    name: Zigbee Torch App
+    needs: build-container
+    strategy:
+      matrix:
+        include:
+          - device: EFR32MG12P332F1024GL125
+            board: brd4166a
+    uses: ./.github/workflows/app-btl-build.yaml
+    with:
+      sdk_version: ${{ needs.build-container.outputs.sdk_version }}
+      device: ${{ matrix.device }}
+      board: ${{ matrix.board }}
+      build_btl:  ${{ github.event.inputs.build_btl != '' && inputs.build_btl || startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/rc') || false }}
+      image_name: ${{ needs.build-container.outputs.image_name }}
+      btl_version: ${{ vars.btl_version != '' && vars.btl_version || '6' }}

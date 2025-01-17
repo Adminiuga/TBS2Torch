@@ -14,8 +14,6 @@ filter:
   value: [Zigbee]
 package: Zigbee
 quality: production
-readme:
-- {path: readme.html}
 source:
 - {path: main.c}
 - {path: app.c}
@@ -171,10 +169,6 @@ configuration:
 - name: SL_BATTERY_MONITOR_R_DIVIDER_R2
   value: 2700
   condition: [power_configuration_server]
-ui_hints:
-  highlight:
-  - {path: '', focus: true}
-  - {path: readme.html}
 sdk_extension:
 - {id: raz1_custom_components, version: 0.0.2}
 

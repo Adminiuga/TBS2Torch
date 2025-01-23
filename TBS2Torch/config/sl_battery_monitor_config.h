@@ -218,7 +218,7 @@
 // <adcPosSelOPA3=> OPA3
 // <adcPosSelDEFAULT=> DEFAULT
 // <adcPosSelVSS=> VSS
-#define SL_BATTERY_MONITOR_ADC_POS_SEL          adcPosSelAVDD
+#define SL_BATTERY_MONITOR_ADC_POS_SEL          adcPosSelAPORT3XCH14
 
 // <e SL_BATTERY_MONITOR_R_DIVIDER_ENABLED> Battery Voltage is using R1/R2 resistive divider
 #define SL_BATTERY_MONITOR_R_DIVIDER_ENABLED    1
